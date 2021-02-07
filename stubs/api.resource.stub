@@ -1,0 +1,43 @@
+<?php
+namespace {{ namespace }};
+
+use Illuminate\Http\Request;
+use Smart\Common\Traits\Resource\Casting;
+use Smart\Common\Traits\Resource\FriendlyToDoc;
+use Smart\Common\Traits\Resource\Scenario;
+use Illuminate\Http\Resources\Json\JsonResource;
+use {{ modelClass }};
+
+/**
+ * {{ class }}资源
+ * @author {{ author }}
+ * @date {{ date }}
+ * @package {{ namespace }}
+ *
+{{ properties }}
+ */
+class {{ class }} extends JsonResource
+{
+    use Scenario;
+    use FriendlyToDoc;
+    use Casting;
+
+    /**
+     * @var string
+     */
+    protected $modelClass = {{ modelClassName }}::class;
+
+    /**
+     * 将资源转换为数组。跟{@see toArray()}不同的是，本函数会将字段按照{@see attributesRules()}里面的类型做强转。
+     * 如果找不到rule，则默认转化成字符串类型
+     * @param Request $request
+     * @return array
+     */
+    public function output($request)
+    {
+        return [
+{{ attributes }}
+{{ relations }}
+        ];
+    }
+}

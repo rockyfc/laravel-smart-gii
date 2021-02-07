@@ -1,0 +1,342 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespace }}\Contracts\RequestInterface;
+use {{ namespace }}\Contracts\ResponseInterface;
+use \GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\RequestOptions;
+
+/**
+ * 本客户端使用\GuzzleHttp\Client为客户端操作类
+ *
+ * 如果项目中不包含"guzzlehttp/guzzle" 软件开发包，请安装它。
+ * 或者重新开发一个RequestInterface, ResponseInterface接口的实现类
+ *
+ * @package {{ namespace }};
+ * @version 1.0
+ */
+class Client implements RequestInterface, ResponseInterface
+{
+    /**
+     * 接口对象
+     * @var Api
+     */
+    protected $api;
+
+    /**
+     * 客户端工具
+     * @var HttpClient
+     */
+    protected $client;
+
+    /**
+     * @var \Psr\Http\Message\ResponseInterface
+     */
+    protected $response;
+
+    /**
+     * @var string
+     */
+    protected static $appId;
+
+    /**
+     * @var string
+     */
+    protected static $appSecret;
+
+    /**
+     * @var string 一个完整的带http的url
+     */
+    protected static $host;
+
+    /**
+     * Client constructor.
+     * @param Api $api
+     */
+    public function __construct(Api $api)
+    {
+        $this->api = $api;
+        $this->client = new HttpClient;
+    }
+
+
+
+    /**
+     * 设置host,appId和appSecret
+     * @param string $host
+     * @param string $appId
+     * @param string $appSecret
+     */
+    public static function setApp(string $host, string $appId, string $appSecret)
+    {
+        static::$appId = $appId;
+        static::$appSecret = $appSecret;
+        static::$host = $host;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function send()
+    {
+        if (in_array('GET', $this->api->getMethod())) {
+            $this->get();
+            return $this;
+        }
+
+        if (in_array('POST', $this->api->getMethod())) {
+            $this->post();
+            return $this;
+        }
+
+        if (in_array('PUT', $this->api->getMethod())) {
+            $this->put();
+            return $this;
+        }
+
+        if (in_array('PATCH', $this->api->getMethod())) {
+            $this->patch();
+            return $this;
+        }
+
+        if (in_array('HEAD', $this->api->getMethod())) {
+            $this->head();
+            return $this;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        $client = new HttpClient;
+        $this->response = $client->get($this->url(), [
+            RequestOptions::HEADERS => $this->api->getHeaders()
+        ]);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function post()
+    {
+        $this->response = $this->client->post($this->url(), [
+            RequestOptions::HEADERS => $this->api->getHeaders(),
+            RequestOptions::JSON => $this->api->getHttpData()
+        ]);
+        return $this;
+
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function put()
+    {
+        $this->response = $this->client->put($this->url(), [
+            RequestOptions::HEADERS => $this->api->getHeaders(),
+            RequestOptions::JSON => $this->api->getHttpData()
+        ]);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function patch()
+    {
+        $this->response = $this->client->patch($this->url(), [
+            RequestOptions::HEADERS => $this->api->getHeaders(),
+            RequestOptions::JSON => $this->api->getHttpData()
+        ]);
+        return $this;
+
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete()
+    {
+        $this->response = $this->client->delete($this->url(), [
+            RequestOptions::HEADERS => $this->api->getHeaders(),
+        ]);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function head()
+    {
+        $this->response = $this->client->head($this->url(), [
+            RequestOptions::HEADERS => $this->api->getHeaders(),
+        ]);
+        return $this;
+    }
+
+    /**
+     * 获取当前环境下的接口域名
+     * @return string
+     */
+    public function url(): string
+    {
+        return static::$host . $this->makeSignUri();
+    }
+
+    /**
+     * uri加签
+     * @return string
+     */
+    protected function makeSignUri()
+    {
+        $uri = $this->api->getUri();
+        $queryParams = array_merge($this->api->getFilteredQueryParams(), [
+                'time' => time(),
+                'app_id' => static::$appId,
+                'format' => 'json',
+                'sign_type' => 'md5'
+            ]
+        );
+
+        //生成签名
+        $queryParams['sign'] = $this->makeMd5Sign(array_merge(
+            $queryParams,
+            $this->api->getHttpData()
+        ));
+
+        //如果是get请求方式，则将queryParams和httpData合并
+        if(in_array('GET', $this->api->getMethod())){
+            $queryParams = array_merge(
+                $queryParams,
+                $this->api->getHttpData()
+            );
+        }
+
+        if ($queryParams) {
+            $queryParams = '?' . http_build_query($queryParams);
+        }
+        return $uri . $queryParams;
+
+
+    }
+
+    /**
+     * md5方式签名
+     * @param $params
+     * @return string
+     */
+    protected function makeMd5Sign($params)
+    {
+        ksort($params);
+        $str = '';
+        foreach ($params as $k => $v) {
+            $str .= $k . $v;
+        }
+        $str .= static::$appSecret;
+        return md5(base64_encode($str));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function originalResponseData(): string
+    {
+        return (string)$this->response->getBody();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function responseArrayData(): array
+    {
+        return (array)json_decode($this->response->getBody(), 1);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInvalid(): bool
+    {
+        return $this->response->getStatusCode() < 100 || $this->response->getStatusCode() >= 600;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInformational(): bool
+    {
+        return $this->response->getStatusCode() >= 100 && $this->response->getStatusCode() < 200;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSuccessful(): bool
+    {
+        return $this->response->getStatusCode() >= 200 && $this->response->getStatusCode() < 300;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRedirection(): bool
+    {
+        return $this->response->getStatusCode() >= 300 && $this->response->getStatusCode() < 400;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientError(): bool
+    {
+        return $this->response->getStatusCode() >= 400 && $this->response->getStatusCode() < 500;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isServerError(): bool
+    {
+        return $this->response->getStatusCode() >= 500 && $this->response->getStatusCode() < 600;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isOk(): bool
+    {
+        return 200 === $this->response->getStatusCode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isForbidden(): bool
+    {
+        return 403 === $this->response->getStatusCode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isNotFound(): bool
+    {
+        return 404 === $this->response->getStatusCode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty(): bool
+    {
+        return \in_array($this->response->getStatusCode(), [204, 304]);
+    }
+
+
+}

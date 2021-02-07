@@ -1,0 +1,13 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Sdk\Api;
+
+class {{ class }} extends Api
+{
+    public $uri = '{{ uri }}';
+
+    public $method = {{ method_array }};
+
+}

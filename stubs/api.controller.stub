@@ -1,0 +1,139 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ modelClass }};
+use {{ resourceClass }};
+use {{ requestClass }};
+use {{ repositoryClass }};
+use Exception;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Validation\ValidationException;
+
+/**
+ * {{ class }}名称
+ *
+ * {{ class }}详情
+ *
+ * @author {{ author }}
+ * @date {{ date }}
+ * @package {{ namespace }}
+ */
+class {{ class }} extends \Illuminate\Routing\Controller
+{
+    /**
+     * @var {{ repositoryClassName }}
+     */
+    protected $repository;
+
+    /**
+     * @param {{ repositoryClassName }} $repository
+     */
+    public function __construct({{ repositoryClassName }} $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * 列表
+     *
+     * 列表数据，支持分页、自定义排序、按需获取。
+     * @param {{ requestClassName }} $request
+     * @see LengthAwarePaginator
+     * @see {{ resourceClassName }}
+     * @return AnonymousResourceCollection
+     * @throws ValidationException
+     * @author {{ author }}
+     * @date {{ date }}
+     */
+    public function index({{ requestClassName }} $request)
+    {
+        //创建一条查询
+        $query = $this->repository->search(
+            $request->validated(), //获取验证后的数据
+            $request->getFilteredRelations(), //加载关联
+            $request->getResolvedSorts() //加载排序
+        );
+
+        //返回集合
+        return {{ resourceClassName }}::collection(
+            $query->paginate($request->getPerPage())
+        );
+    }
+
+    /**
+     * 详情
+     * @param {{ modelClassName }} ${{ model }}
+     * @param {{ requestClassName }} $request
+     * @return {{ resourceClassName }}
+     * @throws ValidationException
+     * @author {{ author }}
+     * @date {{ date }}
+     */
+    public function show({{ modelClassName }} ${{ model }}, {{ requestClassName }} $request)
+    {
+        //加载关联
+        if ($relations = $request->getFilteredRelations()) {
+            ${{ model }}->load($relations);
+        }
+
+        //返回一条资源
+        return new {{ resourceClassName }}(
+            ${{ model }}
+        );
+    }
+
+    /**
+     * 新建
+     * @param {{ requestClassName }} $request
+     * @return {{ resourceClassName }}
+     * @author {{ author }}
+     * @date {{ date }}
+     */
+    public function store({{ requestClassName }} $request)
+    {
+        $model = new {{ modelClassName }}();
+        $model->fill($request->validated());
+        $model->save();
+
+        return new {{ resourceClassName }}(
+            $model
+        );
+    }
+
+    /**
+     * 编辑
+     * @param {{ requestClassName }} $request
+     * @param {{ modelClassName }} ${{ model }}
+     * @return {{ resourceClassName }}
+     * @author {{ author }}
+     * @date {{ date }}
+     */
+    public function update({{ requestClassName }} $request, {{ modelClassName }} ${{ model }})
+    {
+        ${{ model }}->fill($request->validated());
+        ${{ model }}->save();
+
+        return new {{ resourceClassName }}(
+            ${{ model }}
+        );
+    }
+
+    /**
+     * 删除
+     * @param {{ modelClassName }} ${{ model }}
+     * @return Response
+     * @throws Exception
+     * @author {{ author }}
+     * @date {{ date }}
+     */
+    public function destroy({{ modelClassName }} ${{ model }})
+    {
+        ${{ model }}->delete();
+
+        return response(null, 204);
+    }
+
+}

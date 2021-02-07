@@ -1,0 +1,83 @@
+<?php
+
+namespace {{ namespace }};
+
+/**
+ * Interface ResponseInterface
+ * @package {{ namespace }}
+ * @version 1.0
+ */
+interface ResponseInterface
+{
+    /**
+     * 原始响应内容
+     * @return string
+     */
+    public function originalResponseData(): string;
+
+    /**
+     * 获取结果数组
+     * @return array
+     */
+    public function responseArrayData():array;
+
+
+    /**
+     * @return bool
+     */
+    public function isInvalid(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isInformational(): bool;
+
+    /**
+     * 是否执行成功，200到300之间的错误码都表示成功
+     * @return bool
+     */
+    public function isSuccessful(): bool;
+
+    /**
+     * 是否有重定向
+     * @return bool
+     */
+    public function isRedirection(): bool;
+
+    /**
+     * 是否是客户端错误
+     * @return bool
+     */
+    public function isClientError(): bool;
+
+    /**
+     * 是否是服务端错误
+     * @return bool
+     */
+    public function isServerError(): bool;
+
+    /**
+     * 状态码是否等于200
+     * @return bool
+     */
+    public function isOk(): bool;
+
+    /**
+     * 是否禁止访问
+     * @return bool
+     */
+    public function isForbidden(): bool;
+
+    /**
+     * 是否未发现资源
+     * @return bool
+     */
+    public function isNotFound(): bool;
+
+    /**
+     * 是否为空
+     * @return bool
+     */
+    public function isEmpty(): bool;
+
+}

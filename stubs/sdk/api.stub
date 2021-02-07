@@ -1,0 +1,158 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespace }}\Contracts\ApiInterface;
+
+/**
+ * Class Api
+ * @package {{ namespace }}
+ * @version 1.0
+ */
+class Api implements ApiInterface
+{
+
+    /**
+     * @var string 接口名称
+     */
+    protected $uri = null;
+
+    /**
+     * 请求方式
+     * @var string
+     */
+    protected $method = ['GET'];
+
+    /**
+     * @var array
+     */
+    protected $httpData = [];
+
+    /**
+     * @var array
+     */
+    protected $queryParams = [];
+
+    /**
+     * @var array
+     */
+    protected $headers = ['Accept' => 'application/json'];
+
+
+    /**
+     * url的绑定参数
+     * @var array
+     */
+    protected $bindFields = [];
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMethod(string $method)
+    {
+        $this->method = (array)strtoupper($method);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMethod(): array
+    {
+        return $this->method;
+    }
+
+    /**
+     * 将要queryParams中的uri参数过滤掉
+     * @return array
+     */
+    public function getFilteredQueryParams()
+    {
+        return array_diff_assoc((array)$this->queryParams, (array)$this->bindFields);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUri(): string
+    {
+        $uri = $this->uri;
+        foreach ($this->queryParams as $field => $value) {
+            $search = '{' . $field . '}';
+            if (preg_match('/' . $search . '/', $this->uri)) {
+                $this->bindFields[$field] = $value;
+                $uri = vsprintf(str_ireplace($search, '%s', $uri), [$value]);
+            }
+        }
+
+        return $uri;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setQueryParams($name,$value)
+    {
+        $this->queryParams[$name] = $value;
+        $this->queryParams = static::removeNull($this->queryParams);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHeaders($name, $value)
+    {
+        $this->headers[$name] = $value;
+        $this->headers = static::removeNull($this->headers);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQueryParams(): array
+    {
+        return $this->queryParams;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHttpData($name, $value)
+    {
+        $this->httpData[$name] = $value;
+        $this->httpData = static::removeNull($this->httpData);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHttpData(): array
+    {
+        return $this->httpData;
+    }
+
+
+    /**
+     * 过滤掉null值
+     * @param array $data
+     * @return array
+     */
+    protected static function removeNull(array $data)
+    {
+        return array_filter($data, function ($value) {
+            return $value !== null;
+        });
+    }
+}

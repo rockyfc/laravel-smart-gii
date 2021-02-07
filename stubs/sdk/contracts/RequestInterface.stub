@@ -1,0 +1,55 @@
+<?php
+
+namespace {{ namespace }};
+
+
+/**
+ * Interface RequestInterface
+ * @package {{ namespace }}
+ * @version 1.0
+ */
+interface RequestInterface
+{
+    /**
+     * 发送一个请求
+     * @return $this
+     */
+    public function send();
+
+    /**
+     * 发送一个get请求
+     * @return $this
+     */
+    public function get();
+
+    /**
+     * 发送一个post请求
+     * @return $this
+     */
+    public function post();
+
+    /**
+     * 发送一个put请求
+     * @return $this
+     */
+    public function put();
+
+    /**
+     * 发送一个patch请求
+     * @return $this
+     */
+    public function patch();
+
+    /**
+     * 发送一个delete请求
+     * @return $this
+     */
+    public function delete();
+
+    /**
+     * 发送一个head请求
+     * @return $this
+     */
+    public function head();
+
+}

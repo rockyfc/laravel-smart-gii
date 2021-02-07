@@ -1,0 +1,80 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ baseClass }};
+use Smart\Common\Traits\Model\SmartAttributes;
+use Smart\Common\Sources\SmartModel;
+
+
+{{ properties }}
+class {{ class }} extends {{ baseClassName }} implements SmartModel
+{
+    use SmartAttributes;
+
+    /**
+     * 是否允许model自动管理时间字段
+     * @var bool
+     */
+    public $timestamps = {{ timestamps }};
+
+    /**
+     * 模型对应的数据表名称
+     * @var string
+     */
+    protected $table = '{{ table }}';
+
+    /**
+     * 数据库连接
+     * @var null|string
+     */
+    protected $connection = '{{ connection }}';
+
+    /**
+     * 模型主键
+     * @var string
+     */
+    protected $primaryKey = '{{ primaryKey }}';
+
+    /**
+     * 属性白名单，设置允许被修改的属性，它同$guarded正好相反，同时只允许设置其中一个。
+     * @var array
+     */
+    protected $fillable = [];
+
+    /**
+     * 属性黑名单，设置不允许被修改的属性，它同$fillable正好相反，同时只允许设置其中一个。
+     * @var array
+     */
+    protected $guarded = {{ guarded }};
+
+    /**
+     * 系统管理日期字段所用的日期格式，U表示时间戳
+     * @var string
+     */
+    protected $dateFormat = 'U';
+
+    /**
+     * 设置字段默认值
+     * @var array
+     */
+    protected $attributes = {{ attributes }};
+
+    /**
+     * 每一个字段的中文释义
+     * @return array
+     */
+    public function attributesLabels(): array
+    {
+        return {{ attributesLabels }};
+    }
+
+    /**
+     * 表字段的验证规则
+     * @return array
+     */
+    public function attributesRules(): array
+    {
+        return {{ rules }};
+    }
+}

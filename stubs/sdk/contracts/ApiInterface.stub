@@ -1,0 +1,76 @@
+<?php
+
+namespace {{ namespace }};
+
+/**
+ * Interface ApiInterface
+ * @package {{ namespace }}
+ * @version 1.0
+ */
+interface ApiInterface
+{
+
+    /**
+     * 设置当前接口的method
+     * @param string $method
+     * @return mixed
+     */
+    public function setMethod(string $method);
+
+    /**
+     * 获取当前接口methods
+     * @return mixed
+     */
+    public function getMethod();
+
+    /**
+     * 获取当前接口的URI（未加签）
+     * @return string
+     */
+    public function getUri(): string;
+
+    /**
+     * 设置GET请求参数
+     * @param $name
+     * @param $value
+     * @return mixed
+     */
+    public function setQueryParams($name,$value);
+
+    /**
+     * 获取GET请求参数
+     * @return array
+     */
+    public function getQueryParams(): array;
+
+    /**
+     * 设置header
+     * @param string $name
+     * @param string $value
+     * @return mixed
+     */
+    public function setHeaders(string $name, string $value);
+
+    /**
+     * 获取header
+     * @return array
+     */
+    public function getHeaders(): array;
+
+
+    /**
+     * 设置数据体数组
+     * @param $name
+     * @param $value
+     * @return mixed
+     */
+    public function setHttpData($name, $value);
+
+
+    /**
+     * 获取数据体数组
+     * @return array
+     */
+    public function getHttpData(): array;
+
+}

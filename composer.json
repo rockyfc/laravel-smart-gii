@@ -1,0 +1,41 @@
+{
+    "name": "rockyfc/laravel-smart-gii",
+    "description": "laravel api项目，根据逻辑生成接口文档",
+    "keywords": ["laravel", "extension", "doc"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "rockyfc",
+            "email": "softfc@163.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "laravel/framework": "^6.0|^7.0",
+        "rockyfc/laravel-smart-common": "dev-master"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Smart\\Gii\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Smart\\Gii\\GiiServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

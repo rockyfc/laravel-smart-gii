@@ -1,0 +1,46 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ modelClass }};
+use Illuminate\Database\Eloquent\Builder;
+
+class {{ class }}
+{
+    /**
+     * 创建一个查询
+     * @param array|null[] $filters
+     * @param array|null $relations
+     * @param array $sort
+     * @return Builder
+     */
+    public function search(array $filters = {{ filters }}, array $relations = null, array $sort = null)
+    {
+        //过滤掉null值
+        $filters = $this->removeNull($filters);
+
+        //创建一条查询
+        return {{ modelClassName }}::query(){{ where }}
+            ->when($relations, function ($query, $relations) {
+                $query->with($relations);
+            })
+            ->when($sort, function ($query, $sorts) {
+                foreach ($sorts as $item) {
+                    list($field, $value) = $item;
+                    $query->orderBy($field, $value);
+                }
+            });
+    }
+
+    /**
+     * 过滤掉null值
+     * @param array $data
+     * @return array
+     */
+    protected function removeNull(array $data)
+    {
+        return array_filter($data, function ($value) {
+            return $value !== null;
+        });
+    }
+}

@@ -1,0 +1,68 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Foundation\Http\FormRequest as FormValidation;
+use Smart\Common\Traits\Request\Parameters;
+use Smart\Common\Traits\Request\Scenario;
+use Smart\Common\Traits\Request\Validation;
+use Smart\Common\Helpers\Tools;
+use {{ modelClass }};
+
+class {{ class }} extends FormValidation
+{
+    use Parameters;
+    use Scenario;
+    use Validation;
+
+    /**
+     * @var string
+     */
+    protected $modelClass = {{ modelClassName }}::class;
+
+    /**
+     * 当前场景下，需要验证的数据
+     * @return array|mixed
+     */
+    public function validationData()
+    {
+        //列表数据写法特殊
+        if ($this->scenario == 'index') {
+            return $this->getFilter();
+        }
+        return $this->all();
+    }
+
+    /**
+     * 设置每种场景的验证规则
+     * @return array
+     * @throws \Exception
+     */
+    public function rules()
+    {
+        $rules = [];
+
+        //列表
+        $rules['index'] = {{ rules }};
+
+        //详情
+        $rules['show'] = [];
+
+        //新建
+        $rules['store'] = $this->modelRules();
+
+        //更新
+        $rules['update'] = Tools::removeRequiredForRules($this->modelRules());
+
+        return $rules[$this->scenario];
+    }
+
+    /**
+     * 需要排序的字段
+     * @return string[]
+     */
+    public function sorts()
+    {
+        return [];
+    }
+}
