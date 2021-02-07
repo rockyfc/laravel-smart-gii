@@ -18,7 +18,7 @@ class SdkCreator extends GeneratorCommand
     /**
      * @var string
      */
-    protected $name = 'doc:make-sdk';
+    protected $name = 'smart:make-sdk';
 
     /**
      * @var string

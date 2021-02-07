@@ -3,6 +3,7 @@
 namespace Smart\Gii\Http\Repository;
 
 use Illuminate\Support\Str;
+use Smart\Gii\Services\ConfigService;
 
 class BaseRepository
 {
@@ -23,8 +24,8 @@ class BaseRepository
     /**
      * 根据类名获取类文件的路径
      * @param $class
-     * @throws \ReflectionException
      * @return false|string
+     * @throws \ReflectionException
      */
     public function getFilePathByClassName($class)
     {
@@ -75,7 +76,7 @@ class BaseRepository
      */
     protected function getControllerSuffix()
     {
-        return config('gii.suffix.class.controller');
+        return ConfigService::controllerSuffix();
     }
 
     /**
@@ -84,7 +85,7 @@ class BaseRepository
      */
     protected function getResourceSuffix()
     {
-        return config('gii.suffix.class.resource');
+        return ConfigService::resourceSuffix();
     }
 
     /**
@@ -93,7 +94,7 @@ class BaseRepository
      */
     protected function getRepositorySuffix()
     {
-        return config('gii.suffix.class.repository');
+        return ConfigService::repositorySuffix();
     }
 
     /**
@@ -102,7 +103,7 @@ class BaseRepository
      */
     protected function getFormRequestSuffix()
     {
-        return config('gii.suffix.class.formRequest');
+        return ConfigService::formRequestSuffix();
     }
 
     /**
@@ -111,7 +112,7 @@ class BaseRepository
      */
     protected function getModelSuffix()
     {
-        return config('gii.suffix.class.model');
+        return ConfigService::modelSuffix();
     }
 
     /**

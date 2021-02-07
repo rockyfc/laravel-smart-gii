@@ -6,7 +6,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Index;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types as Type;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
@@ -369,11 +369,11 @@ class ModelCreatorService extends BaseService
                 $rule[] = 'numeric';
             }
 
-            if (Type::DATETIME == $column->getType()->getName()) {
+            if (Type::DATETIME_MUTABLE == $column->getType()->getName()) {
                 $rule[] = 'datetime';
             }
 
-            if (Type::DATE == $column->getType()->getName()) {
+            if (Type::DATE_MUTABLE == $column->getType()->getName()) {
                 $rule[] = 'date';
             }
 

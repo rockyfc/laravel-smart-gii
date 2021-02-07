@@ -20,7 +20,7 @@ class ControllerCreator extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'doc:make-controller';
+    protected $name = 'smart:make-controller';
 
     /**
      * The console command description.

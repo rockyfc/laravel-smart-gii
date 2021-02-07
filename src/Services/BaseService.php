@@ -3,6 +3,7 @@
 namespace Smart\Gii\Services;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 
 class BaseService
 {
@@ -13,33 +14,31 @@ class BaseService
     protected function formatToPhpType(Type $type)
     {
         if (in_array($type->getName(), [
-            Type::BINARY,
-            Type::BLOB,
-            Type::DATE_IMMUTABLE,
-            Type::DATEINTERVAL,
-            Type::DATETIME_IMMUTABLE,
-            Type::DATETIMETZ_IMMUTABLE,
-            Type::JSON,
-            Type::OBJECT,
-            Type::STRING,
-            Type::TEXT,
-            Type::DATETIME,
-            Type::DATE,
+            Types::BINARY,
+            Types::BLOB,
+            Types::DATE_IMMUTABLE,
+            Types::DATEINTERVAL,
+            Types::DATETIME_IMMUTABLE,
+            Types::DATETIMETZ_IMMUTABLE,
+            Types::JSON,
+            Types::OBJECT,
+            Types::STRING,
+            Types::TEXT,
         ])) {
             return 'string';
         }
 
         if (in_array($type->getName(), [
-            Type::BIGINT,
-            Type::INTEGER,
-            Type::SMALLINT,
+            Types::BIGINT,
+            Types::INTEGER,
+            Types::SMALLINT,
         ])) {
             return 'int';
         }
 
         if (in_array($type->getName(), [
-            Type::DECIMAL,
-            Type::FLOAT,
+            Types::DECIMAL,
+            Types::FLOAT,
         ])) {
             return 'float';
         }

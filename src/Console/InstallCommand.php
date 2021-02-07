@@ -11,7 +11,7 @@ class InstallCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'doc:install-gii';
+    protected $signature = 'smart:install-gii';
 
     /**
      * The console command description.

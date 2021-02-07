@@ -19,7 +19,7 @@ class ModelCreator extends GeneratorCommand
     /**
      * @var string
      */
-    protected $name = 'doc:make-model';
+    protected $name = 'smart:make-model';
 
     /**
      * @var string

@@ -2,10 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('vendor/doc/css/bootstrap.min.css') }}">
-    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-    <script src="{{ asset('vendor/doc/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('vendor/gii/js/common.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('vendor/smart/css/bootstrap.min.css') }}">
+    <script src="{{ asset('vendor/smart/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/smart/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('vendor/smart/js/common.js') }}"></script>
     <style>
         .label-default {
             background: #cfefdf;

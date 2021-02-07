@@ -19,7 +19,7 @@ class RepositoryCreator extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'doc:make-repository';
+    protected $name = 'smart:make-repository';
 
     /**
      * The console command description.

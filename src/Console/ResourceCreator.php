@@ -19,7 +19,7 @@ class ResourceCreator extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'doc:make-resource';
+    protected $name = 'smart:make-resource';
 
     /**
      * The console command description.

@@ -20,7 +20,7 @@ class RequestFormCreator extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'doc:make-request-form';
+    protected $name = 'smart:make-request-form';
 
     /**
      * The console command description.

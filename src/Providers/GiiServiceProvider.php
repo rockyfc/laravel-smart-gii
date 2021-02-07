@@ -12,6 +12,7 @@ use Smart\Gii\Console\RequestFormCreator;
 use Smart\Gii\Console\ResourceCreator;
 use Smart\Gii\Console\SdkCreator;
 use Smart\Gii\Console\SdkRestCreator;
+use Smart\Gii\Services\ConfigService;
 
 class GiiServiceProvider extends ServiceProvider
 {
@@ -22,11 +23,9 @@ class GiiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (!config('gii.enabled')) {
+        if (!ConfigService::enabled()) {
             return;
         }
-
-        //Route::middlewareGroup('doc', config('doc.middleware', []));
 
         $this->registerRoutes();
         $this->registerPublishing();
@@ -39,10 +38,8 @@ class GiiServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->mergeConfigFrom(
-            __DIR__ . '/../../config/gii.php',
-            'gii'
-        );
+
+        $this->mergeConfigFrom($this->configFile(), ConfigService::key());
 
         $this->commands([
             InstallCommand::class,
@@ -63,11 +60,11 @@ class GiiServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../../public' => public_path('vendor/gii'),
+                __DIR__ . '/../../public' => public_path('vendor/smart'),
             ], 'gii-assets');
 
             $this->publishes([
-                __DIR__ . '/../../config/gii.php' => config_path('gii.php'),
+                $this->configFile() => config_path('smart-gii.php'),
             ], 'gii-config');
         }
     }
@@ -78,8 +75,24 @@ class GiiServiceProvider extends ServiceProvider
     private function registerRoutes()
     {
         Route::group($this->routeConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/../../routes/gii.php');
+            $this->loadRoutesFrom($this->routeFile());
         });
+    }
+
+    /**
+     * @return string
+     */
+    private function configFile()
+    {
+        return __DIR__ . '/../../config/smart-gii.php';
+    }
+
+    /**
+     * @return string
+     */
+    private function routeFile()
+    {
+        return __DIR__ . '/../../routes/smart-gii.php';
     }
 
     /**
@@ -90,9 +103,9 @@ class GiiServiceProvider extends ServiceProvider
     private function routeConfiguration()
     {
         return [
-            'domain' => config('gii.domain', null),
+            'domain' => ConfigService::domain(),
             'namespace' => 'Smart\Gii\Http\Controllers',
-            'prefix' => config('gii.prefix'),
+            'prefix' => ConfigService::prefix(),
             'middleware' => config('middleware'),
         ];
     }

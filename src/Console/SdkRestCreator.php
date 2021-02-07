@@ -19,7 +19,7 @@ class SdkRestCreator extends GeneratorCommand
     /**
      * @var string
      */
-    protected $name = 'doc:make-sdk-rest';
+    protected $name = 'smart:make-sdk-rest';
 
     /**
      * @var string
