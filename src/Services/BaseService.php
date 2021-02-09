@@ -17,6 +17,7 @@ class BaseService
             Types::BINARY,
             Types::BLOB,
             Types::DATE_IMMUTABLE,
+            Types::DATETIME_MUTABLE,
             Types::DATEINTERVAL,
             Types::DATETIME_IMMUTABLE,
             Types::DATETIMETZ_IMMUTABLE,

@@ -43,26 +43,53 @@ class {{ class }} extends FormValidation
         $rules = [];
 
         //列表
-        $rules['index'] = {{ rules }};
+        $rules['index'] = $this->indexRules();
 
         //详情
         $rules['show'] = [];
 
         //新建
-        $rules['store'] = $this->modelRules();
+        $rules['store'] = $this->storeRules();
 
         //更新
-        $rules['update'] = Tools::removeRequiredForRules($this->modelRules());
+        $rules['update'] = $this->updateRules();
 
         return $rules[$this->scenario];
     }
 
     /**
-     * 需要排序的字段
+     * 列表查询 - 验证规则
+     * @return array
+     */
+    protected function indexRules(): array
+    {
+        return {{ rules }};
+    }
+
+    /**
+     * 列表查询 - 需要排序的字段
      * @return string[]
      */
-    public function sorts()
+    public function sorts(): array
     {
         return [];
+    }
+
+    /**
+     * 新建 - 验证规则
+     * @return array
+     */
+    protected function storeRules(): array
+    {
+        return $this->modelRules();
+    }
+
+    /**
+     * 更新 - 验证规则
+     * @return array
+     */
+    protected function updateRules(): array
+    {
+        return Tools::removeRequiredForRules($this->modelRules());
     }
 }

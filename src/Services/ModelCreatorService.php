@@ -71,8 +71,8 @@ class ModelCreatorService extends BaseService
 
     /**
      * 获取要创建的文件内容
-     * @throws FileNotFoundException
      * @return string
+     * @throws FileNotFoundException
      */
     public function getFileContent()
     {
@@ -127,9 +127,37 @@ class ModelCreatorService extends BaseService
     }
 
     /**
+     * 替换模板文件中的{{ dateFormat }}标签
+     *
+     * @param $stub
+     * @return $this
+     */
+    protected function replaceDataFormat(&$stub)
+    {
+        $str = 'U';
+        $tableColumns = $this->getTableColumns();
+
+        if (key_exists(Model::UPDATED_AT, $tableColumns)
+            and key_exists(Model::CREATED_AT, $tableColumns)) {
+
+            $time = $tableColumns[Model::UPDATED_AT];
+            $type = $this->formatToPhpType($time->getType());
+
+            if ($type === 'string') {
+                $str = 'Y-m-d H:i:s';
+            }
+
+        }
+
+        $stub = str_replace(['{{ dateFormat }}', '{{dateFormat}}'], $str, $stub);
+
+        return $this;
+    }
+
+    /**
      * @param string $name
-     * @throws FileNotFoundException
      * @return string
+     * @throws FileNotFoundException
      */
     protected function buildClass($name)
     {
@@ -144,6 +172,7 @@ class ModelCreatorService extends BaseService
             ->replaceRules($stub)
             ->replaceGuarded($stub)
             ->replaceTimestamps($stub)
+            ->replaceDataFormat($stub)
             ->replacePrimaryKey($stub)
             ->replaceAttributesLabels($stub)
             ->replaceBaseClass($stub)
@@ -437,7 +466,7 @@ class ModelCreatorService extends BaseService
                 continue;
             }
 
-            if (null === $column->getDefault() or Type::DATETIME == $column->getType()->getName()) {
+            if (null === $column->getDefault() or Type::DATETIME_MUTABLE == $column->getType()->getName()) {
                 $value = null;
             } else {
                 $value = $column->getDefault();
@@ -585,12 +614,12 @@ class ModelCreatorService extends BaseService
             }
 
             if (is_array($val) and in_array($val['type'], [
-                Type::INTEGER,
-                Type::BIGINT,
-                Type::SMALLINT,
-                Type::FLOAT,
-                Type::DECIMAL,
-            ])) {
+                    Type::INTEGER,
+                    Type::BIGINT,
+                    Type::SMALLINT,
+                    Type::FLOAT,
+                    Type::DECIMAL,
+                ])) {
                 $str .= $prefix . "        '" . $k . "' => " . $val['value'] . ",\r\n";
 
                 continue;

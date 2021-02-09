@@ -36,8 +36,27 @@ class {{ class }} extends JsonResource
     public function output($request)
     {
         return [
-{{ attributes }}
-{{ relations }}
+{{ attributes }}{{ relations }}
         ];
+    }
+
+    /**
+     * 获取返回值的类型
+     * @return mixed
+     * @throws \Exception
+     */
+    public function attributesRules()
+    {
+        return $this->model()->attributesRules();
+    }
+
+    /**
+     * 获取返回值字段说明
+     * @return mixed
+     * @throws \Exception
+     */
+    public function attributesLabels()
+    {
+        return $this->model()->attributesLabels();
     }
 }
