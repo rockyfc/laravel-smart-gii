@@ -2,9 +2,14 @@
 
 namespace Smart\Gii\Http\Repository;
 
+use Composer\Autoload\ClassMapGenerator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
+use Smart\Gii\Services\ConfigService;
 use Smart\Gii\Services\ModelCreatorService;
+use Smart\Gii\Services\ModelFixerServices;
+use Symfony\Component\Finder\SplFileInfo;
 
 class ModelRepository extends BaseRepository
 {
@@ -106,5 +111,30 @@ class ModelRepository extends BaseRepository
 
             return false;
         }
+    }
+
+
+    public function getModifiedModels()
+    {
+
+        /** @var SplFileInfo[] $files */
+        $models = [];
+        foreach (ConfigService::modelPath() as $path) {
+
+            $classMap = ClassMapGenerator::createMap($path);
+            $models = array_merge($models, $classMap);
+        }
+
+        $files = [];
+        foreach ($models as $class => $filename) {
+            $service = new ModelFixerServices($class);
+
+            if ($service->getNewComment() !== $service->getOriginComment()) {
+                $files[$class] = $filename;
+            }
+        }
+
+
+        return $files;
     }
 }

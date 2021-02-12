@@ -3,7 +3,9 @@
 Route::get('/', 'ModelController@index')->name('gii.index');
 
 Route::get('/model', 'ModelController@index')->name('gii.model.index');
-Route::get('/model/fixer', 'ModelController@fixer')->name('gii.model.fixer');
+Route::get('/model/fixer-show', 'ModelController@showfixer')->name('gii.model.fixer.show');
+Route::post('/model/fixer', 'ModelController@fixer')->name('gii.model.fixer');
+
 Route::get('/model/tables/{connection}', 'ModelController@tables')->name('gii.model.tables');
 Route::get('/model/table-to-model/{table}', 'ModelController@tableToModel')->name('gii.model.table-to-model');
 Route::post('/model/preview', 'ModelController@preview')->name('gii.model.preview');

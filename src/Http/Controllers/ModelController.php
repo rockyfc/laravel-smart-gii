@@ -3,6 +3,7 @@
 namespace Smart\Gii\Http\Controllers;
 
 use App\Models\Content;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\View\View;
@@ -41,11 +42,24 @@ class ModelController extends Controller
         ]);
     }
 
-    public function fixer()
+    public function showFixer()
     {
-        $service = new ModelFixerServices(Content::class);
-        echo $service->getFileContent();
-        exit;
+        //print_r();
+        return view('gii::model_fixer', [
+            'models' => $this->repository->getModifiedModels()
+        ]);
+    }
+
+    /**
+     * @param ModelRequestForm $form
+     * @return int
+     * @throws BindingResolutionException
+     * @throws ReflectionException
+     */
+    public function fixer(ModelRequestForm $form)
+    {
+        $service = new ModelFixerServices($form->post('model'));
+        return $service->fix();
     }
 
     /**
@@ -105,8 +119,8 @@ class ModelController extends Controller
 
     /**
      * @param ModelRequestForm $request
-     * @throws ReflectionException
      * @return array[]
+     * @throws ReflectionException
      */
     public function generate(ModelRequestForm $request)
     {

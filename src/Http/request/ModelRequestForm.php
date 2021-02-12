@@ -37,6 +37,10 @@ class ModelRequestForm extends FormRequest
             'classes' => ['required'],
         ]);
 
+        $rules['fixer'] = [
+            'model' => ['required'],
+        ];
+
         return $rules[$this->scenario];
     }
 

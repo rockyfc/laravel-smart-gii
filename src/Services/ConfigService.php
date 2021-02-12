@@ -71,5 +71,8 @@ class ConfigService
         return config(self::key() . '.suffix.middleware');
     }
 
-
+    public static function modelPath()
+    {
+        return config(self::key() . '.model_path');
+    }
 }
