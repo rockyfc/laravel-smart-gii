@@ -7,6 +7,9 @@ let AppRequest = (function () {
             data: data,
             dataType: 'json',
             success: function (response) {
+                $('.form-group').removeClass('has-error')
+                $('.fc-error').remove();
+
                 if (success) {
                     success(response);
                 } else {
@@ -15,6 +18,10 @@ let AppRequest = (function () {
             },
             error: function (xhr, status) {
                 console.log('xhr', xhr);
+                $('.form-group').removeClass('has-error');
+
+                $('.fc-error').remove();
+
                 if (xhr.status == 422) {
                     if (typeof (xhr.responseJSON) == 'string') {
                         //$.toast(xhr.responseJSON);
@@ -23,6 +30,16 @@ let AppRequest = (function () {
                     if (typeof (xhr.responseJSON.message) == 'string') {
                         //$.toast(xhr.responseJSON.message);
                         //return;
+                    }
+
+                    if (typeof (xhr.responseJSON.errors) == "object") {
+                        for(let i in xhr.responseJSON.errors){
+                            let error = xhr.responseJSON.errors[i];
+                            $('input[name='+i+']').after('<span class="help-block fc-error">'+error[0]+'</span>');
+                            $('.error-'+i).addClass('has-error').append('<span class="help-block fc-error">'+error[0]+'</span>');
+                            $('input[name='+i+']').parents('.form-group').addClass('has-error')
+                        }
+
                     }
                 }
                 if (xhr.status == 429) {
