@@ -59,6 +59,9 @@ class ModelController extends Controller
     public function fixer(ModelRequestForm $form)
     {
         $service = new ModelFixerServices($form->post('model'));
+        if ($form->post('type') == 1) {
+            $service->setIsReset(true);
+        }
         return $service->fix();
     }
 

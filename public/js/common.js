@@ -33,11 +33,23 @@ let AppRequest = (function () {
                     }
 
                     if (typeof (xhr.responseJSON.errors) == "object") {
-                        for(let i in xhr.responseJSON.errors){
+                        for (let i in xhr.responseJSON.errors) {
                             let error = xhr.responseJSON.errors[i];
-                            $('input[name='+i+']').after('<span class="help-block fc-error">'+error[0]+'</span>');
-                            $('.error-'+i).addClass('has-error').append('<span class="help-block fc-error">'+error[0]+'</span>');
-                            $('input[name='+i+']').parents('.form-group').addClass('has-error')
+
+                            let input = null;
+                            if ($('input[name=' + i + ']').length) {
+                                input = $('input[name=' + i + ']');
+                            } else if ($('select[name=' + i + ']').length) {
+                                input = $('select[name=' + i + ']');
+                            }
+
+                            if (input == null) {
+                                continue;
+                            }
+
+                            input.after('<span class="help-block fc-error">' + error[0] + '</span>');
+                            $('.error-' + i).addClass('has-error').append('<span class="help-block fc-error">' + error[0] + '</span>');
+                            input.parents('.form-group').addClass('has-error')
                         }
 
                     }

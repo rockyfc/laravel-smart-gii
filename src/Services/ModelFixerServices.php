@@ -79,7 +79,7 @@ class ModelFixerServices
      * 是否完全重置注释内容
      * @var bool
      */
-    protected $isReset = true;
+    protected $isReset = false;
 
     /**
      * @param bool $isReset
