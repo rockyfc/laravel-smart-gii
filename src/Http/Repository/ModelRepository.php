@@ -130,6 +130,8 @@ class ModelRepository extends BaseRepository
             $service = new ModelFixerServices($class);
 
             if ($service->getNewComment() !== $service->getOriginComment()) {
+                logger('new--->'.$service->getNewComment());
+                logger('old--->'.$service->getOriginComment());
                 $files[$class] = $filename;
             }
         }

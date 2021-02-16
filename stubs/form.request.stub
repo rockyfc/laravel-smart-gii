@@ -30,6 +30,11 @@ class {{ class }} extends FormValidation
         if ($this->scenario == 'index') {
             return $this->getFilter();
         }
+
+        if ($this->getMethod() === 'POST') {
+            return $this->post();
+        }
+
         return $this->all();
     }
 
@@ -40,19 +45,12 @@ class {{ class }} extends FormValidation
      */
     public function rules()
     {
-        $rules = [];
-
-        //列表
-        $rules['index'] = $this->indexRules();
-
-        //详情
-        $rules['show'] = [];
-
-        //新建
-        $rules['store'] = $this->storeRules();
-
-        //更新
-        $rules['update'] = $this->updateRules();
+        $rules = [
+            'index' => $this->indexRules(), //列表
+            'show' => [], //详情
+            'store' => $this->storeRules(), //新建
+            'update' => $this->updateRules() //更新
+        ];
 
         return $rules[$this->scenario];
     }

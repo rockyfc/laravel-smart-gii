@@ -157,25 +157,14 @@ class ModelFixerServices
     protected function getPhpDocForWrite()
     {
 
-        //$reflection = new \ReflectionClass($this->modelInstance());
         $namespace = $this->reflection->getNamespaceName();
         $classname = $this->reflection->getShortName();
 
-        $interfaceNames = array_diff_key(
-            $this->reflection->getInterfaceNames(),
-            $this->reflection->getParentClass()->getInterfaceNames()
-        );
-
-
         if ($this->isReset) {
-            $phpdoc = new DocBlock($classname, new Context($namespace));
-        } else {
-            $phpdoc = new DocBlock($this->reflection, new Context($namespace));
+            return new DocBlock($classname, new Context($namespace));
         }
 
-        return $phpdoc;
-
-
+        return new DocBlock($this->reflection, new Context($namespace));
     }
 
     /**
@@ -189,6 +178,12 @@ class ModelFixerServices
 
         foreach ($phpdoc->getTags() as $tag) {
             $name = $tag->getName();
+
+            if (!in_array($name, $this->properties)) {
+                $phpdoc->deleteTag($tag);
+                continue;
+            }
+
             if ($name == 'property' || $name == 'property-read' || $name == 'property-write') {
                 $properties[] = $tag->getVariableName();
             }
@@ -455,7 +450,7 @@ class ModelFixerServices
 
         //Single model is returned
         $this->setProperty(
-            $method, '\\'.$relatedModelClass, true, null, '',
+            $method, '\\' . $relatedModelClass, true, null, '',
             $this->isRelationNullable($relationObj)
         );
 
@@ -553,14 +548,17 @@ class ModelFixerServices
         //如果原来有注释，则覆盖
         if ($originalDoc) {
             $newContent = str_replace($originalDoc, $newComment, $content);
-            $this->file->put($this->reflection->getFileName(), $newContent);
+            //$this->file->put($this->reflection->getFileName(), $newContent);
+            $this->file->replace($this->reflection->getFileName(), $newContent);
+            logger(file_get_contents($this->reflection->getFileName()));
             return true;
         }
         $pos = strpos($content, "class {$this->reflection->getShortName()}");
         //如果原来没有注释，则获取类的起始位置
         if ($pos !== false) {
             $content = substr_replace($content, $newComment . "\n", $pos, 0);
-            $this->file->put($this->reflection->getFileName(), $content);
+            //$this->file->put($this->reflection->getFileName(), $content);
+            $this->file->replace($this->reflection->getFileName(), $content);
             return true;
         }
 

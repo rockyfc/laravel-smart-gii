@@ -44,7 +44,6 @@ class ModelController extends Controller
 
     public function showFixer()
     {
-        //print_r();
         return view('gii::model_fixer', [
             'models' => $this->repository->getModifiedModels()
         ]);
@@ -62,7 +61,11 @@ class ModelController extends Controller
         if ($form->post('type') == 1) {
             $service->setIsReset(true);
         }
-        return $service->fix();
+
+        $service->fix();
+        $form->session()->flash('_message', '操作成功');
+        return true;
+
     }
 
     /**

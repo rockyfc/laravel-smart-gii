@@ -106,7 +106,7 @@ class GiiServiceProvider extends ServiceProvider
             'domain' => ConfigService::domain(),
             'namespace' => 'Smart\Gii\Http\Controllers',
             'prefix' => ConfigService::prefix(),
-            'middleware' => config('middleware'),
+            'middleware' => 'web'
         ];
     }
 }

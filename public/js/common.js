@@ -84,6 +84,7 @@ let AppRequest = (function () {
         //提交表单
         submitForm: function (form, success, error, completed) {
             let jqForm = $(form);
+            this.init();
             request(
                 jqForm.attr('action'),
                 jqForm.serialize(),
