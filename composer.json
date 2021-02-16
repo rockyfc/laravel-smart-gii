@@ -1,7 +1,7 @@
 {
     "name": "rockyfc/laravel-smart-gii",
     "description": "laravel api项目，根据逻辑生成接口文档",
-    "keywords": ["laravel", "extension", "doc"],
+    "keywords": ["laravel", "extension", "gii"],
     "license": "MIT",
     "authors": [
         {
