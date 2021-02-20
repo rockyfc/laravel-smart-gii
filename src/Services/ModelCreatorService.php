@@ -515,10 +515,16 @@ class ModelCreatorService extends BaseService
     protected function replaceProperties(&$stub)
     {
         $columns = $this->getTableColumns();
+        $name = explode('\\', $this->className);
+        $shortName = end($name);
 
-        $str = "/**\n";
+        $str = "/**\n * " . $shortName . "\n *\n";
         foreach ($columns as $col) {
             $type = trim($this->formatToPhpType($col->getType()), '\\');
+            if (!$col->getNotnull()) {
+                $type .= '|null';
+            }
+
             $str .= " * @property {$type} $" . $col->getName() . " {$col->getComment()}\n";
         }
         $str .= ' */';

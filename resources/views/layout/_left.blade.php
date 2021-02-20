@@ -14,7 +14,9 @@
                 <a href="{{route('gii.ctrl.index',['menu=ctrl'])}}" class="list-group-item @if(request('menu')=='ctrl') active @endif">创建Controller</a>
                 <a href="{{route('gii.curd.index',['menu=curd'])}}" class="list-group-item @if(request('menu')=='curd') active @endif">创建CURD</a>
                 <a href="{{route('gii.sdk.index',['menu=sdk'])}}" class="list-group-item @if(request('menu')=='sdk') active @endif">创建SDK</a>
+{{--
                 <a href="{{route('gii.tester.index',['menu=tester'])}}" class="list-group-item @if(request('menu')=='tester') active @endif">创建Test Case</a>
+--}}
             </div>
         </div>
 

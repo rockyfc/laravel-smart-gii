@@ -26,14 +26,14 @@ class {{ class }} extends \Illuminate\Routing\Controller
     /**
      * @var {{ repositoryClassName }}
      */
-    protected $repository;
+    protected $biz;
 
     /**
-     * @param {{ repositoryClassName }} $repository
+     * @param {{ repositoryClassName }} $biz
      */
-    public function __construct({{ repositoryClassName }} $repository)
+    public function __construct({{ repositoryClassName }} $biz)
     {
-        $this->repository = $repository;
+        $this->biz = $biz;
     }
 
     /**
@@ -51,7 +51,7 @@ class {{ class }} extends \Illuminate\Routing\Controller
     public function index({{ requestClassName }} $request)
     {
         //创建一条查询
-        $query = $this->repository->search(
+        $query = $this->biz->search(
             $request->validated(), //获取验证后的数据
             $request->getFilteredRelations(), //加载关联
             $request->getResolvedSorts() //加载排序

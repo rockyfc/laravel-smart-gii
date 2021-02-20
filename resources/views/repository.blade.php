@@ -3,11 +3,11 @@
 @section('content')
     <div class="page-header">
         <h3>
-            Repository 生成器
+            Biz 生成器
             <small> </small>
         </h3>
         <p>
-            此生成器为您生成一个带有Model查询的Repository。
+            此生成器为您生成一个带有Model查询的Biz，建议针对每个Controller生成一个唯一的Biz类来处理相关业务。
         </p>
     </div>
 
@@ -22,15 +22,15 @@
                 请输入一个已存在的Eloquent Model。<br/>
                 输入完成后，您可以点击
                 <a  onclick="Current.guessByModel()" class="btn btn-link ">联想</a>
-                来实现根据Model自动载入FormRequest类，但不保证正确性。
+                来实现根据Model自动载入Biz类，但不保证正确性。
             </span>
         </div>
         <div class="form-group">
-            <label for="form">Repository 类</label>
+            <label for="form">Biz 类</label>
             <input type="text" class="form-control" name="repository" id="repository" placeholder=""
-            value="App\Http\Repositories\">
-            <span class="help-block">对于Repository类的命名，强烈建议您按照相对应的Controller名称命名
-                     并用后缀<code>{{config('gii.suffix.class.repository')}}</code>结尾。
+            value="App\Http\Biz\">
+            <span class="help-block">对于Biz类的命名，强烈建议您按照相对应的Controller名称命名
+                     并用后缀<code>{{\Smart\Gii\Services\ConfigService::repositorySuffix()}}</code>结尾。
 
             </span>
         </div>

@@ -17,7 +17,7 @@ return [
             'resource' => env('SMART_GII_RESOURCE_SUFFIX', 'Resource'),
             'formRequest' => env('SMART_GII_REQUEST_FORM_SUFFIX', 'Request'),
             'model' => env('SMART_GII_MODEL_SUFFIX', ''),
-            'repository' => env('SMART_GII_MODEL_SUFFIX', 'Repository'),
+            'repository' => env('SMART_GII_MODEL_SUFFIX', 'Biz'),
         ],
     ],
 

@@ -48,22 +48,22 @@
             <label for="form">Form Request 类</label>
             <input type="text" class="form-control" name="form" id="form" placeholder=""
                    value="">
-            <span class="help-block">表单类建议用后缀<code>{{config('gii.suffix.class.formRequest')}}</code>结尾。</span>
+            <span class="help-block">表单类建议用后缀<code>{{\Smart\Gii\Services\ConfigService::formRequestSuffix()}}</code>结尾。</span>
 
         </div>
         <div class="form-group">
             <label for="resource">Resource 类</label>
             <input type="text" class="form-control" name="resource" id="resource" placeholder=""
                    value="">
-            <span class="help-block">资源类建议以后缀<code>{{config('gii.suffix.class.resource')}}</code>结尾。</span>
+            <span class="help-block">资源类建议以后缀<code>{{\Smart\Gii\Services\ConfigService::resourceSuffix()}}</code>结尾。</span>
         </div>
 
         <div class="form-group">
-            <label for="form">Repository 类</label>
+            <label for="form">Biz 类</label>
             <input type="text" class="form-control" name="repository" id="repository" placeholder=""
-                   value="App\Http\Repositories\">
-            <span class="help-block">对于Repository类的命名，强烈建议您按照相对应的Controller名称命名
-                     并用后缀<code>{{config('gii.suffix.class.repository')}}</code>结尾。
+                   value="App\Http\Biz\">
+            <span class="help-block">对于Biz命名，强烈建议您按照相对应的Controller名称命名
+                     并用后缀<code>{{\Smart\Gii\Services\ConfigService::repositorySuffix()}}</code>结尾。
 
             </span>
         </div>

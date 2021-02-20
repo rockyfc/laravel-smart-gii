@@ -30,7 +30,7 @@
             <input type="text" class="form-control" name="form" id="form" placeholder=""
             value="App\Http\Requests\">
             <span class="help-block">对于Form Request类的命名，强烈建议您使用单数形式。
-                     并用后缀<code>{{config('gii.suffix.class.formRequest')}}</code>结尾。
+                     并用后缀<code>{{\Smart\Gii\Services\ConfigService::formRequestSuffix()}}</code>结尾。
 
             </span>
         </div>

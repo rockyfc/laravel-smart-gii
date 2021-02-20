@@ -31,7 +31,7 @@
             value="App\Http\Resources\">
             <span class="help-block">
                 对于资源类的命名，强烈建议您使用单数形式，
-                并且以后缀<code>{{config('gii.suffix.class.resource')}}</code>结尾。
+                并且以后缀<code>{{\Smart\Gii\Services\ConfigService::resourceSuffix()}}</code>结尾。
             </span>
         </div>
 
