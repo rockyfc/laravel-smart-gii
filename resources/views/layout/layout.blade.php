@@ -42,7 +42,7 @@
 
 
                 <p class="navbar-text navbar-right" style="padding-right: 10px;">
-                    <a href="{{route('gii.index')}}" class="navbar-link">GII </a>
+                    <a href="/smart-doc" class="navbar-link">Api Doc </a>
                     <a href="#" class="navbar-link">欢迎使用 </a>
                 </p>
             </div>

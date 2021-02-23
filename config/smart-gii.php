@@ -22,7 +22,8 @@ return [
     ],
 
     'model_path'=>[
-        app_path().'/Models'
+        app_path().'/Models',
+        app_path().'/Components/Migrate/Models',
     ],
 
     'middleware' => [

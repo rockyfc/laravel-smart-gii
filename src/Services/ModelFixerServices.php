@@ -9,6 +9,7 @@ use Barryvdh\Reflection\DocBlock\Serializer as DocBlockSerializer;
 use Barryvdh\Reflection\DocBlock\Tag;
 use Doctrine\DBAL\Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -61,6 +62,11 @@ class ModelFixerServices
     protected $file;
 
     /**
+     * @var string
+     */
+    protected $dateClass;
+
+    /**
      * ModelResolverService constructor.
      * @param string $modelClass
      * @throws ReflectionException
@@ -73,6 +79,10 @@ class ModelFixerServices
         $this->file = new Filesystem();
         $this->modelInstance();
 
+
+        $this->dateClass = class_exists(\Illuminate\Support\Facades\Date::class)
+            ? '\\' . get_class(\Illuminate\Support\Facades\Date::now())
+            : '\Illuminate\Support\Carbon';
     }
 
     /**
@@ -148,6 +158,7 @@ class ModelFixerServices
     {
         $this->setPropertiesFromTable();
         $this->setPropertiesFromMethods();
+        $this->setPropertiesFromCast();
     }
 
     /**
@@ -218,14 +229,19 @@ class ModelFixerServices
 
     /**
      * 从数据表获取property
+     * @throws BindingResolutionException
      * @throws Exception
      */
     protected function setPropertiesFromTable()
     {
         foreach ($this->getTableColumns() as $column) {
+            $type = null;
+            if (in_array($column->getName(), $this->modelInstance()->getDates())) {
+                $type = $this->dateClass;
+            }
             $this->setProperty(
                 $column->getName(),
-                $this->convertToPhpType($column->getType()),
+                $type ? $type : $this->convertToPhpType($column->getType()),
                 true,
                 true,
                 $column->getComment(),
@@ -267,6 +283,37 @@ class ModelFixerServices
             }
 
         }
+
+    }
+
+
+    /**
+     * @throws BindingResolutionException
+     */
+    protected function setPropertiesFromCast()
+    {
+        $model = $this->modelInstance();
+        if (!method_exists($model, 'getCasts')) {
+            return;
+        }
+
+        $casts = $model->getCasts();
+        foreach ($casts as $name => $type) {
+
+            $realType = $this->castPropertiesType($model);
+
+            if (!isset($this->properties[$name])) {
+                continue;
+            }
+
+            $realType = $this->checkForCustomLaravelCasts($realType);
+            $this->properties[$name]['type'] = $this->getTypeInModel($model, $realType);
+
+            if (isset($this->nullableColumns[$name])) {
+                $this->properties[$name]['type'] .= '|null';
+            }
+        }
+
 
     }
 
@@ -474,13 +521,6 @@ class ModelFixerServices
         //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
         $reflection = new \ReflectionMethod($model, $method);
 
-//        if ($returnType = $reflection->getReturnType()) {
-//            $type = $returnType instanceof \ReflectionNamedType ? $returnType->getName() : (string)$returnType;
-//        } else {
-//            // php 7.x type or fallback to docblock
-//            $type = (string)$this->getReturnTypeFromDocBlock($reflection);
-//        }
-
         $file = new \SplFileObject($reflection->getFileName());
         $file->seek($reflection->getStartLine() - 1);
 
@@ -676,46 +716,6 @@ class ModelFixerServices
 
 
     /**
-     * Get the parameters and format them correctly
-     *
-     * @param $method
-     * @return array
-     * @throws \ReflectionException
-     */
-    public function getParameters(\ReflectionMethod $method)
-    {
-        //Loop through the default values for parameters, and make the correct output string
-        $paramsWithDefault = [];
-
-        foreach ($method->getParameters() as $param) {
-            $paramStr = '$' . $param->getName();
-            if ($paramType = $this->getParamType($method, $param)) {
-                $paramStr = $paramType . ' ' . $paramStr;
-            }
-
-            if ($param->isOptional() && $param->isDefaultValueAvailable()) {
-                $default = $param->getDefaultValue();
-                if (is_bool($default)) {
-                    $default = $default ? 'true' : 'false';
-                } elseif (is_array($default)) {
-                    $default = '[]';
-                } elseif (is_null($default)) {
-                    $default = 'null';
-                } elseif (is_int($default)) {
-                    //$default = $default;
-                } else {
-                    $default = "'" . trim($default) . "'";
-                }
-
-                $paramStr .= " = $default";
-            }
-
-            $paramsWithDefault[] = $paramStr;
-        }
-        return $paramsWithDefault;
-    }
-
-    /**
      * @param object $model
      * @param string|null $type
      * @return string|null
@@ -806,5 +806,84 @@ class ModelFixerServices
         $fkProp->setAccessible(true);
 
         return isset($this->nullableColumns[$fkProp->getValue($relationObj)]);
+    }
+
+    /**
+     * @param $model
+     */
+    protected function castPropertiesType($type)
+    {
+        $realType = 'string';
+        switch ($type) {
+            case 'boolean':
+            case 'bool':
+                $realType = 'boolean';
+                break;
+            case 'string':
+                $realType = 'string';
+                break;
+            case 'array':
+            case 'json':
+                $realType = 'array';
+                break;
+            case 'object':
+                $realType = 'object';
+                break;
+            case 'int':
+            case 'integer':
+            case 'timestamp':
+                $realType = 'integer';
+                break;
+            case 'real':
+            case 'double':
+            case 'float':
+                $realType = 'float';
+                break;
+            case 'date':
+            case 'datetime':
+                $realType = $this->dateClass;
+                break;
+            case 'collection':
+                $realType = '\Illuminate\Support\Collection';
+                break;
+            default:
+                // In case of an optional custom cast parameter , only evaluate
+                // the `$type` until the `:`
+                $type = strtok($type, ':');
+                $realType = class_exists($type) ? ('\\' . $type) : 'mixed';
+                break;
+        }
+
+        return $realType;
+
+
+    }
+
+    protected
+    function checkForCustomLaravelCasts(string $type): ?string
+    {
+        if (!class_exists($type) || !interface_exists(CastsAttributes::class)) {
+            return $type;
+        }
+
+        $reflection = new \ReflectionClass($type);
+
+        if (!$reflection->implementsInterface(CastsAttributes::class)) {
+            return $type;
+        }
+
+        $methodReflection = new \ReflectionMethod($type, 'get');
+
+        $reflectionType = $this->getReturnTypeFromReflection($methodReflection);
+
+        if ($reflectionType === null) {
+            $reflectionType = $this->getReturnTypeFromDocBlock($methodReflection);
+        }
+
+        if ($reflectionType === 'static' || $reflectionType === '$this') {
+            $reflectionType = $type;
+        }
+
+        return $reflectionType;
     }
 }

@@ -198,7 +198,6 @@ class Client implements RequestInterface, ResponseInterface
         $queryParams = array_merge($this->api->getFilteredQueryParams(), [
                 'time' => time(),
                 'app_id' => static::$appId,
-                'format' => 'json',
                 'sign_type' => 'md5'
             ]
         );

@@ -125,13 +125,15 @@ class ModelRepository extends BaseRepository
             $models = array_merge($models, $classMap);
         }
 
+        //print_r(ConfigService::modelPath());exit;
+
         $files = [];
         foreach ($models as $class => $filename) {
             $service = new ModelFixerServices($class);
 
             if ($service->getNewComment() !== $service->getOriginComment()) {
-                logger('new--->'.$service->getNewComment());
-                logger('old--->'.$service->getOriginComment());
+                //logger('new--->'.$service->getNewComment());
+                //logger('old--->'.$service->getOriginComment());
                 $files[$class] = $filename;
             }
         }

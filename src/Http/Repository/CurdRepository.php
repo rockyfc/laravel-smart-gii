@@ -106,7 +106,7 @@ class CurdRepository extends BaseRepository
             'controller' => $this->formatClass($controller, $this->getControllerSuffix()),
             'form' => $this->formatClass($namespace . '\Requests\\' . $name, $this->getFormRequestSuffix()),
             'resource' => $this->formatClass($namespace . '\Resources\\' . $name, $this->getResourceSuffix()),
-            'repository' => $name ? $this->formatClass($namespace . '\Repositories\\' . $name, $this->getRepositorySuffix()) : '',
+            'repository' => $name ? $this->formatClass($namespace . '\Biz\\' . $name, $this->getRepositorySuffix()) : '',
         ];
     }
 
@@ -129,7 +129,7 @@ class CurdRepository extends BaseRepository
             'controller' => $name ? $this->formatClass('App\Http\Controllers\\' . $name, $this->getControllerSuffix()) : '',
             'form' => $name ? $this->formatClass('App\Http\Requests\\' . $name, $this->getFormRequestSuffix()) : '',
             'resource' => $name ? $this->formatClass('App\Http\Resources\\' . $name, $this->getResourceSuffix()) : '',
-            'repository' => $name ? $this->formatClass('App\Http\Repositories\\' . $name, $this->getRepositorySuffix()) : '',
+            'repository' => $name ? $this->formatClass('App\Http\Biz\\' . $name, $this->getRepositorySuffix()) : '',
             'model' => $this->formatClass($model, $this->getModelSuffix()),
         ];
     }
