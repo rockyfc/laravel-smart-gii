@@ -23,28 +23,15 @@ class {{ class }}
         //创建一条查询
         return {{ modelClassName }}::query(){{ where }}
             ->when($relations, function ($query, $relations) {
-                $query->with($relations);//立即加载关联
+                $query->with($relations); //立即加载关联
             })
             ->when($sort, function ($query, $sorts) {
                 foreach ($sorts as $item) {
                     list($field, $value) = $item;
-                    $query->orderBy($field, $value);//排序
+                    $query->orderBy($field, $value); //排序
                 }
             });
     }
-
-    /**
-     * 过滤掉null值
-     * @param array $data
-     * @return array
-     */
-    protected function removeNull(array $data)
-    {
-        return array_filter($data, function ($value) {
-            return $value !== null;
-        });
-    }
-
 
     /**
      * 更新
@@ -74,15 +61,26 @@ class {{ class }}
         return $model;
     }
 
-
     /**
      * 删除
      * @param {{ modelClassName }} $model
-     * @return null|bool
+     * @return bool|null
      * @throws Exception
      */
     public function delete({{ modelClassName }} $model)
     {
         return $model->delete();
+    }
+
+    /**
+     * 过滤掉null值
+     * @param array $data
+     * @return array
+     */
+    protected function removeNull(array $data)
+    {
+        return array_filter($data, function ($value) {
+            return $value !== null;
+        });
     }
 }

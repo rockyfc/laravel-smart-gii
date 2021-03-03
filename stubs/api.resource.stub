@@ -12,8 +12,6 @@ use {{ modelClass }};
  * {{ class }}资源
  * @author {{ author }}
  * @date {{ date }}
- * @package {{ namespace }}
- *
 {{ properties }}
  */
 class {{ class }} extends JsonResource
@@ -42,8 +40,8 @@ class {{ class }} extends JsonResource
 
     /**
      * 获取返回值的类型
-     * @return mixed
      * @throws \Exception
+     * @return mixed
      */
     public function attributesRules()
     {
@@ -52,8 +50,8 @@ class {{ class }} extends JsonResource
 
     /**
      * 获取返回值字段说明
-     * @return mixed
      * @throws \Exception
+     * @return mixed
      */
     public function attributesLabels()
     {

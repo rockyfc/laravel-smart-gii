@@ -40,8 +40,8 @@ class {{ class }} extends FormValidation
 
     /**
      * 设置每种场景的验证规则
-     * @return array
      * @throws \Exception
+     * @return array
      */
     public function rules()
     {
@@ -49,7 +49,7 @@ class {{ class }} extends FormValidation
             'index' => $this->indexRules(), //列表
             'show' => [], //详情
             'store' => $this->storeRules(), //新建
-            'update' => $this->updateRules() //更新
+            'update' => $this->updateRules(), //更新
         ];
 
         return $rules[$this->scenario];

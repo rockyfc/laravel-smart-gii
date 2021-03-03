@@ -19,7 +19,6 @@ use Illuminate\Validation\ValidationException;
  *
  * @author {{ author }}
  * @date {{ date }}
- * @package {{ namespace }}
  */
 class {{ class }} extends \Illuminate\Routing\Controller
 {
@@ -43,8 +42,8 @@ class {{ class }} extends \Illuminate\Routing\Controller
      * @param {{ requestClassName }} $request
      * @see LengthAwarePaginator
      * @see {{ resourceClassName }}
-     * @return AnonymousResourceCollection
      * @throws ValidationException
+     * @return AnonymousResourceCollection
      * @author {{ author }}
      * @date {{ date }}
      */
@@ -68,8 +67,8 @@ class {{ class }} extends \Illuminate\Routing\Controller
      *
      * @param {{ modelClassName }} ${{ model }}
      * @param {{ requestClassName }} $request
-     * @return {{ resourceClassName }}
      * @throws ValidationException
+     * @return {{ resourceClassName }}
      * @author {{ author }}
      * @date {{ date }}
      */
@@ -125,8 +124,8 @@ class {{ class }} extends \Illuminate\Routing\Controller
      * 删除
      *
      * @param {{ modelClassName }} ${{ model }}
-     * @return Response
      * @throws Exception
+     * @return Response
      * @author {{ author }}
      * @date {{ date }}
      */
