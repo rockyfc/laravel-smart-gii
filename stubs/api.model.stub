@@ -6,7 +6,6 @@ use {{ baseClass }};
 use Smart\Common\Traits\Model\SmartAttributes;
 use Smart\Common\Sources\SmartModel;
 
-
 {{ properties }}
 class {{ class }} extends {{ baseClassName }} implements SmartModel
 {

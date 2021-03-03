@@ -96,9 +96,7 @@ class {{ class }} extends \Illuminate\Routing\Controller
      */
     public function store({{ requestClassName }} $request)
     {
-        $model = new {{ modelClassName }}();
-        $model->fill($request->validated());
-        $model->save();
+        $model = $this->biz->insert($request->validated());
 
         return new {{ resourceClassName }}(
             $model
@@ -116,8 +114,7 @@ class {{ class }} extends \Illuminate\Routing\Controller
      */
     public function update({{ requestClassName }} $request, {{ modelClassName }} ${{ model }})
     {
-        ${{ model }}->fill($request->validated());
-        ${{ model }}->save();
+        $this->biz->update(${{ model }}, $request->validated());
 
         return new {{ resourceClassName }}(
             ${{ model }}
@@ -135,7 +132,7 @@ class {{ class }} extends \Illuminate\Routing\Controller
      */
     public function destroy({{ modelClassName }} ${{ model }})
     {
-        ${{ model }}->delete();
+        $this->biz->delete(${{ model }});
 
         return response(null, 204);
     }

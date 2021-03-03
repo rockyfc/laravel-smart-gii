@@ -3,6 +3,7 @@
 namespace {{ namespace }};
 
 use {{ modelClass }};
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 
 class {{ class }}
@@ -42,5 +43,46 @@ class {{ class }}
         return array_filter($data, function ($value) {
             return $value !== null;
         });
+    }
+
+
+    /**
+     * 更新
+     * @param {{ modelClassName }} $model
+     * @param array $data
+     * @return {{ modelClassName }}
+     */
+    public function update({{ modelClassName }} $model, array $data)
+    {
+        $model->fill($data);
+        $model->save();
+
+        return $model;
+    }
+
+    /**
+     * 插入
+     * @param array $data
+     * @return {{ modelClassName }}
+     */
+    public function insert(array $data)
+    {
+        $model = new {{ modelClassName }}();
+        $model->fill($data);
+        $model->save();
+
+        return $model;
+    }
+
+
+    /**
+     * 删除
+     * @param {{ modelClassName }} $model
+     * @return null|bool
+     * @throws Exception
+     */
+    public function delete({{ modelClassName }} $model)
+    {
+        return $model->delete();
     }
 }
