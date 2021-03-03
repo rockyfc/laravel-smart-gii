@@ -3,6 +3,7 @@
 namespace Smart\Gii\Services;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Smart\Common\Helpers\Tools;
@@ -62,8 +63,8 @@ class RepositoryCreatorService extends BaseService
     /**
      * 获取要创建的文件内容
      *
-     * @throws FileNotFoundException
      * @return mixed
+     * @throws FileNotFoundException
      */
     public function getFileContent()
     {
@@ -74,8 +75,8 @@ class RepositoryCreatorService extends BaseService
 
     /**
      * @param $name
-     * @throws FileNotFoundException
      * @return mixed
+     * @throws FileNotFoundException
      */
     protected function buildClass($name)
     {
@@ -215,7 +216,9 @@ class RepositoryCreatorService extends BaseService
         return array_merge(
             $arr,
             array_filter($rules, function ($rule, $attribute) use ($arr) {
-                return in_array('integer', $rule) and !in_array($attribute, $arr);
+                return in_array('integer', $rule)
+                    and !in_array($attribute, $arr)
+                    and !in_array($attribute, [$this->modelClass::UPDATED_AT, $this->modelClass::CREATED_AT]);
             }, ARRAY_FILTER_USE_BOTH)
         );
     }

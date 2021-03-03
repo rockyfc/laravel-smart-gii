@@ -23,12 +23,12 @@ class {{ class }}
         //创建一条查询
         return {{ modelClassName }}::query(){{ where }}
             ->when($relations, function ($query, $relations) {
-                $query->with($relations);
+                $query->with($relations);//立即加载关联
             })
             ->when($sort, function ($query, $sorts) {
                 foreach ($sorts as $item) {
                     list($field, $value) = $item;
-                    $query->orderBy($field, $value);
+                    $query->orderBy($field, $value);//排序
                 }
             });
     }
