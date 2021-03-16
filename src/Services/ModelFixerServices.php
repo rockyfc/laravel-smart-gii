@@ -478,7 +478,7 @@ class ModelFixerServices
         if (strpos(get_class($relationObj), 'Many') !== false) {
             $collection = $this->getCollectionClass($relatedModelClass);
             $this->setProperty($method, $collection . '|' . '\\' . $relatedModelClass . '[]', true, null);
-            $this->setProperty(Str::snake($method) . '_count', 'int|null', true, false);
+            //$this->setProperty(Str::snake($method) . '_count', 'int|null', true, false);
 
             return;
         }
