@@ -113,7 +113,7 @@ class {{ class }} extends \Illuminate\Routing\Controller
      */
     public function update({{ requestClassName }} $request, {{ modelClassName }} ${{ model }})
     {
-        $this->biz->update(${{ model }}, $request->validated());
+        ${{ model }} = $this->biz->update(${{ model }}, $request->validated());
 
         return new {{ resourceClassName }}(
             ${{ model }}

@@ -44,7 +44,7 @@ class {{ class }}
         $model->fill($data);
         $model->save();
 
-        return $model;
+        return $model->withoutRelations()->refresh();
     }
 
     /**
@@ -58,7 +58,7 @@ class {{ class }}
         $model->fill($data);
         $model->save();
 
-        return $model;
+        return $model->withoutRelations()->refresh();
     }
 
     /**
