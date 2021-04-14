@@ -31,10 +31,6 @@ class {{ class }} extends FormValidation
             return $this->getFilter();
         }
 
-        if ($this->getMethod() === 'POST') {
-            return $this->post();
-        }
-
         return $this->all();
     }
 
