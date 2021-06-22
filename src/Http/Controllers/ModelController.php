@@ -65,7 +65,6 @@ class ModelController extends Controller
         $service->fix();
         $form->session()->flash('_message', '操作成功');
         return true;
-
     }
 
     /**

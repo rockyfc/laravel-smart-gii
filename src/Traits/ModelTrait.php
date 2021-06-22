@@ -9,7 +9,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Illuminate\Database\Eloquent\Model;
 
-Trait ModelTrait
+trait ModelTrait
 {
     /**
      * 数据库中的数据类型和php语法中定义的类型的对应关系
@@ -82,6 +82,4 @@ Trait ModelTrait
     {
         return $this->getSchema()->listTableColumns($this->modelInstance->getTable());
     }
-
-
 }

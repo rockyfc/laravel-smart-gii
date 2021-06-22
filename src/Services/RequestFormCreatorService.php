@@ -52,8 +52,8 @@ class RequestFormCreatorService
 
     /**
      * 获取要创建的文件内容
-     * @throws FileNotFoundException
      * @return mixed
+     * @throws FileNotFoundException
      */
     public function getFileContent()
     {
@@ -62,8 +62,8 @@ class RequestFormCreatorService
 
     /**
      * @param $name
-     * @throws FileNotFoundException
      * @return mixed
+     * @throws FileNotFoundException
      */
     protected function buildClass($name)
     {
@@ -195,7 +195,7 @@ class RequestFormCreatorService
             if (is_string($val)) {
                 $val = explode('|', $val);
             }
-
+            $val = array_merge(['nullable'], $val);
             $str .= $prefix . "\t\t'" . $name . "' => [";
             foreach ($val as $k => $v) {
                 $str .= "'" . $v . "', ";

@@ -38,7 +38,6 @@ class GiiServiceProvider extends ServiceProvider
 
     public function register()
     {
-
         $this->mergeConfigFrom($this->configFile(), ConfigService::key());
 
         $this->commands([

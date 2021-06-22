@@ -120,7 +120,6 @@ class ModelRepository extends BaseRepository
         /** @var SplFileInfo[] $files */
         $models = [];
         foreach (ConfigService::modelPath() as $path) {
-
             $classMap = ClassMapGenerator::createMap($path);
             $models = array_merge($models, $classMap);
         }

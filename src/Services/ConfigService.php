@@ -2,10 +2,8 @@
 
 namespace Smart\Gii\Services;
 
-
 class ConfigService
 {
-
     public static function key()
     {
         return 'smart-gii';

@@ -139,14 +139,12 @@ class ModelCreatorService extends BaseService
 
         if (key_exists(Model::UPDATED_AT, $tableColumns)
             and key_exists(Model::CREATED_AT, $tableColumns)) {
-
             $time = $tableColumns[Model::UPDATED_AT];
             $type = $this->formatToPhpType($time->getType());
 
             if ($type === 'string') {
                 $str = 'Y-m-d H:i:s';
             }
-
         }
 
         $stub = str_replace(['{{ dateFormat }}', '{{dateFormat}}'], $str, $stub);

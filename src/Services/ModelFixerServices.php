@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Smart\Gii\Services;
 
 use Barryvdh\Reflection\DocBlock;
@@ -145,7 +144,6 @@ class ModelFixerServices
         $serializer = new DocBlockSerializer();
 
         return $serializer->getDocComment($phpdoc);
-
     }
 
     /**
@@ -167,7 +165,6 @@ class ModelFixerServices
      */
     protected function getPhpDocForWrite()
     {
-
         $namespace = $this->reflection->getNamespaceName();
         $classname = $this->reflection->getShortName();
 
@@ -219,11 +216,9 @@ class ModelFixerServices
 
             $tag = Tag::createInstance($tagLine, $phpdoc);
             $phpdoc->appendTag($tag);
-
         }
 
         return $phpdoc;
-
     }
 
 
@@ -281,9 +276,7 @@ class ModelFixerServices
                 $this->setPropertiesFromRelationMethod($method);
                 continue;
             }
-
         }
-
     }
 
 
@@ -299,7 +292,6 @@ class ModelFixerServices
 
         $casts = $model->getCasts();
         foreach ($casts as $name => $type) {
-
             $realType = $this->castPropertiesType($model);
 
             if (!isset($this->properties[$name])) {
@@ -313,8 +305,6 @@ class ModelFixerServices
                 $this->properties[$name]['type'] .= '|null';
             }
         }
-
-
     }
 
     /**
@@ -356,7 +346,6 @@ class ModelFixerServices
             && Str::endsWith($method, 'Attribute')
             && $method !== 'setAttribute'
         );
-
     }
 
 
@@ -369,7 +358,6 @@ class ModelFixerServices
      */
     protected function setPropertiesFromGetAttributeMethods(string $method)
     {
-
         if (!$this->isGetAttributeMethod($method)) {
             return false;
         }
@@ -387,7 +375,6 @@ class ModelFixerServices
         $this->setProperty($name, $type, true, null);
 
         return true;
-
     }
 
     /**
@@ -456,7 +443,6 @@ class ModelFixerServices
             if ($relationObj instanceof Relation) {
                 return true;
             }
-
         }
         return false;
     }
@@ -470,7 +456,6 @@ class ModelFixerServices
      */
     protected function setPropertiesFromRelationMethod(string $method)
     {
-
         $model = $this->modelInstance();
         $relationObj = $this->getRelationFromMethod($method);
 
@@ -484,12 +469,14 @@ class ModelFixerServices
         }
 
         if (strpos(get_class($relationObj), 'morphTo') !== false) {
-
             exit('暂未实现对morphTo ORM关系的解析');
             // Model isn't specified because relation is polymorphic
-            $this->setProperty($method,
+            $this->setProperty(
+                $method,
                 $this->getClassNameInDestinationFile($model, Model::class) . '|\Eloquent',
-                true, null);
+                true,
+                null
+            );
 
             return;
         }
@@ -497,13 +484,15 @@ class ModelFixerServices
 
         //Single model is returned
         $this->setProperty(
-            $method, '\\' . $relatedModelClass, true, null, '',
+            $method,
+            '\\' . $relatedModelClass,
+            true,
+            null,
+            '',
             $this->isRelationNullable($relationObj)
         );
 
         return;
-
-
     }
 
 
@@ -516,7 +505,6 @@ class ModelFixerServices
      */
     protected function getMethodContent(string $method)
     {
-
         $model = $this->modelInstance();
         //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
         $reflection = new \ReflectionMethod($model, $method);
@@ -533,7 +521,6 @@ class ModelFixerServices
         $begin = strpos($code, 'function(');
 
         return substr($code, $begin, strrpos($code, '}') - $begin + 1);
-
     }
 
 
@@ -581,7 +568,6 @@ class ModelFixerServices
      */
     protected function setModelFileContent(string $newComment)
     {
-
         $originalDoc = $this->reflection->getDocComment();
         $content = $this->getModelFileContent();
 
@@ -603,7 +589,6 @@ class ModelFixerServices
         }
 
         return false;
-
     }
 
 
@@ -855,12 +840,9 @@ class ModelFixerServices
         }
 
         return $realType;
-
-
     }
 
-    protected
-    function checkForCustomLaravelCasts(string $type): ?string
+    protected function checkForCustomLaravelCasts(string $type): ?string
     {
         if (!class_exists($type) || !interface_exists(CastsAttributes::class)) {
             return $type;
