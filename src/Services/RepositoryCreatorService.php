@@ -178,8 +178,8 @@ class RepositoryCreatorService extends BaseService
         $str = '';
         foreach ($rules as $attribute => $rule) {
             $key = Str::camel($attribute);
-            $str .= "\n            ->when(data_get(\$filters, '{$attribute}'), function (\$query, \${$key}) {\n";
-            $str .= "                \$query->where('{$attribute}', \${$key});\n";
+            $str .= "\n            ->when(isset(\$filters['{$attribute}']), function (\$query) use (\$filters) {\n";
+            $str .= "                \$query->where('{$attribute}', \$filters['{$attribute}']);\n";
             $str .= '            })';
         }
 
