@@ -73,4 +73,9 @@ class ConfigService
     {
         return config(self::key() . '.model_path');
     }
+
+    public static function allowedEnv()
+    {
+        return config(self::key() . '.allowed_env');
+    }
 }

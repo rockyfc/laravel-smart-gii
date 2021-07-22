@@ -22,8 +22,13 @@ return [
     ],
 
     'model_path'=>[
-        app_path().'/Models',
-        app_path().'/Components/Migrate/Models',
+        app_path().'/Models'
+    ],
+
+    //允许使用本插件的运行环境
+    'allowed_env'=>[
+        'local',
+        'dev'
     ],
 
     'middleware' => [

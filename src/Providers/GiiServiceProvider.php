@@ -27,6 +27,10 @@ class GiiServiceProvider extends ServiceProvider
             return;
         }
 
+        if(!in_array(app()->environment(),ConfigService::allowedEnv())){
+            return;
+        }
+
         $this->registerRoutes();
         $this->registerPublishing();
 
