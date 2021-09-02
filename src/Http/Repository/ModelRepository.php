@@ -128,6 +128,12 @@ class ModelRepository extends BaseRepository
 
         $files = [];
         foreach ($models as $class => $filename) {
+
+            $ref = new \ReflectionClass($class);
+            if(!$ref->isInstantiable()){
+                continue;
+            }
+
             $service = new ModelFixerServices($class);
 
             if ($service->getNewComment() !== $service->getOriginComment()) {
