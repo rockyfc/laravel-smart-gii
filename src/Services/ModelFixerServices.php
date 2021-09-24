@@ -292,7 +292,7 @@ class ModelFixerServices
 
         $casts = $model->getCasts();
         foreach ($casts as $name => $type) {
-            $realType = $this->castPropertiesType($model);
+            $realType = $this->castPropertiesType($type);
 
             if (!isset($this->properties[$name])) {
                 continue;
