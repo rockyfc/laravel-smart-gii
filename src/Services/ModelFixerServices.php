@@ -197,6 +197,7 @@ class ModelFixerServices
             }
         }
 
+
         foreach ($this->properties as $name => $property) {
             $name = "\$$name";
 
@@ -576,7 +577,7 @@ class ModelFixerServices
             $newContent = str_replace($originalDoc, $newComment, $content);
             //$this->file->put($this->reflection->getFileName(), $newContent);
             $this->file->replace($this->reflection->getFileName(), $newContent);
-            logger(file_get_contents($this->reflection->getFileName()));
+            //logger(file_get_contents($this->reflection->getFileName()));
             return true;
         }
         $pos = strpos($content, "class {$this->reflection->getShortName()}");
@@ -620,6 +621,8 @@ class ModelFixerServices
         }
         $this->properties[$name]['read'] = $isRead;
         $this->properties[$name]['write'] = $isWrite;
+
+        //logger()->info($name.'->'.$type);
     }
 
 
@@ -816,6 +819,8 @@ class ModelFixerServices
                 break;
             case 'int':
             case 'integer':
+                $realType = 'int';
+                break;
             case 'timestamp':
                 $realType = 'integer';
                 break;
