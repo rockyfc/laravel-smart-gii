@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
+use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionClass;
 use ReflectionException;
@@ -373,9 +374,27 @@ class ModelFixerServices
         $reflection = new \ReflectionMethod($model, $method);
         $type = $this->getReturnType($reflection);
         $type = $this->getTypeInModel($model, $type);
-        $this->setProperty($name, $type, true, null);
+        $title = $this->getMethodTitle($reflection);
+        $this->setProperty($name, $type, true, null,$title);
 
         return true;
+    }
+
+    /**
+     * @param $reflection
+     * @return string
+     */
+    private function getMethodTitle($reflection){
+        $comment = $reflection->getDocComment();
+        if (! $comment) {
+            return '';
+        }
+            $factory = DocBlockFactory::createInstance();
+            $docblock = $factory->create(
+                $comment,
+                (new ContextFactory())->createFromReflector($reflection)
+            );
+        return $docblock->getSummary();
     }
 
     /**
