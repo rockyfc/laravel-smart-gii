@@ -28,6 +28,11 @@ class SdkRestCreatorService extends BaseService
     protected $namespace;
 
     /**
+     * @var
+     */
+    protected $sdkNamespace;
+
+    /**
      * @var Route
      */
     protected $route;
@@ -63,6 +68,18 @@ class SdkRestCreatorService extends BaseService
         return $this;
     }
 
+    /**
+     * 设置要创建的class
+     * @param string $sdkNamespace
+     * @return $this
+     */
+    public function setSdkNamespace(string $sdkNamespace)
+    {
+        $this->sdkNamespace = str_ireplace('\\\\', '\\', $sdkNamespace);
+
+        return $this;
+    }
+
     public function getClassName()
     {
         return $this->className;
@@ -90,6 +107,7 @@ class SdkRestCreatorService extends BaseService
         $stub = $this->files->get($this->getStub());
 
         return $this->replaceNamespace($stub, $name)
+            ->replaceSdkNamespace($stub)
             ->replaceUri($stub)
             ->replaceMethodArray($stub)
             ->replaceClass($stub, $name);
@@ -105,6 +123,21 @@ class SdkRestCreatorService extends BaseService
         $stub = str_replace(
             '{{ namespace }}',
             $this->getNamespace($name),
+            $stub
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param $stub
+     * @return $this
+     */
+    protected function replaceSdkNamespace(&$stub)
+    {
+        $stub = str_replace(
+            '{{ sdk_namespace }}',
+            $this->sdkNamespace,
             $stub
         );
 

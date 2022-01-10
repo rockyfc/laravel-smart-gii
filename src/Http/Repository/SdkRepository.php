@@ -90,6 +90,7 @@ class SdkRepository extends BaseRepository
                 [
                     'name' => $class = $this->getRestName($route, $package),
                     'action' => $route->getActionName(),
+                    'sdk_namespace' => $package,
                     '--path' => $this->getPath(),
                     '--force' => true,
                 ]

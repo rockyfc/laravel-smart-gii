@@ -4,15 +4,9 @@ namespace {{ namespace }};
 
 use {{ namespace }}\Contracts\RequestInterface;
 use {{ namespace }}\Contracts\ResponseInterface;
-use \GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\RequestOptions;
 
 /**
- * 本客户端使用\GuzzleHttp\Client为客户端操作类
- *
- * 如果项目中不包含"guzzlehttp/guzzle" 软件开发包，请安装它。
- * 或者重新开发一个RequestInterface, ResponseInterface接口的实现类
- *
+ * http 客户端
  * @package {{ namespace }};
  * @version 1.0
  */
@@ -23,17 +17,6 @@ class Client implements RequestInterface, ResponseInterface
      * @var Api
      */
     protected $api;
-
-    /**
-     * 客户端工具
-     * @var HttpClient
-     */
-    protected $client;
-
-    /**
-     * @var \Psr\Http\Message\ResponseInterface
-     */
-    protected $response;
 
     /**
      * @var string
@@ -51,16 +34,28 @@ class Client implements RequestInterface, ResponseInterface
     protected static $host;
 
     /**
+     * @var int 状态码
+     */
+    protected $statusCode;
+
+    /**
+     * @var string 错误消息
+     */
+    protected $errorMessage;
+
+    /**
+     * @var string 请求正确时的数据
+     */
+    protected $data;
+
+    /**
      * Client constructor.
      * @param Api $api
      */
     public function __construct(Api $api)
     {
         $this->api = $api;
-        $this->client = new HttpClient;
     }
-
-
 
     /**
      * 设置host,appId和appSecret
@@ -75,7 +70,6 @@ class Client implements RequestInterface, ResponseInterface
         static::$host = $host;
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -83,26 +77,31 @@ class Client implements RequestInterface, ResponseInterface
     {
         if (in_array('GET', $this->api->getMethod())) {
             $this->get();
+
             return $this;
         }
 
         if (in_array('POST', $this->api->getMethod())) {
             $this->post();
+
             return $this;
         }
 
         if (in_array('PUT', $this->api->getMethod())) {
             $this->put();
+
             return $this;
         }
 
         if (in_array('PATCH', $this->api->getMethod())) {
             $this->patch();
+
             return $this;
         }
 
         if (in_array('HEAD', $this->api->getMethod())) {
             $this->head();
+
             return $this;
         }
     }
@@ -112,11 +111,12 @@ class Client implements RequestInterface, ResponseInterface
      */
     public function get()
     {
-        $client = new HttpClient;
-        $this->response = $client->get($this->url(), [
-            RequestOptions::HEADERS => $this->api->getHeaders()
-        ]);
-        return $this;
+        return $this->httpRequest(
+            'get',
+            $this->url(),
+            $this->api->getHttpData(),
+            $this->api->getHeaders()
+        );
     }
 
     /**
@@ -124,12 +124,12 @@ class Client implements RequestInterface, ResponseInterface
      */
     public function post()
     {
-        $this->response = $this->client->post($this->url(), [
-            RequestOptions::HEADERS => $this->api->getHeaders(),
-            RequestOptions::JSON => $this->api->getHttpData()
-        ]);
-        return $this;
-
+        return $this->httpRequest(
+            'post',
+            $this->url(),
+            $this->api->getHttpData(),
+            $this->api->getHeaders()
+        );
     }
 
     /**
@@ -137,11 +137,12 @@ class Client implements RequestInterface, ResponseInterface
      */
     public function put()
     {
-        $this->response = $this->client->put($this->url(), [
-            RequestOptions::HEADERS => $this->api->getHeaders(),
-            RequestOptions::JSON => $this->api->getHttpData()
-        ]);
-        return $this;
+        return $this->httpRequest(
+            'put',
+            $this->url(),
+            $this->api->getHttpData(),
+            $this->api->getHeaders()
+        );
     }
 
     /**
@@ -149,12 +150,12 @@ class Client implements RequestInterface, ResponseInterface
      */
     public function patch()
     {
-        $this->response = $this->client->patch($this->url(), [
-            RequestOptions::HEADERS => $this->api->getHeaders(),
-            RequestOptions::JSON => $this->api->getHttpData()
-        ]);
-        return $this;
-
+        return $this->httpRequest(
+            'patch',
+            $this->url(),
+            $this->api->getHttpData(),
+            $this->api->getHeaders()
+        );
     }
 
     /**
@@ -162,10 +163,12 @@ class Client implements RequestInterface, ResponseInterface
      */
     public function delete()
     {
-        $this->response = $this->client->delete($this->url(), [
-            RequestOptions::HEADERS => $this->api->getHeaders(),
-        ]);
-        return $this;
+        return $this->httpRequest(
+            'delete',
+            $this->url(),
+            $this->api->getHttpData(),
+            $this->api->getHeaders()
+        );
     }
 
     /**
@@ -173,10 +176,12 @@ class Client implements RequestInterface, ResponseInterface
      */
     public function head()
     {
-        $this->response = $this->client->head($this->url(), [
-            RequestOptions::HEADERS => $this->api->getHeaders(),
-        ]);
-        return $this;
+        return $this->httpRequest(
+            'head',
+            $this->url(),
+            $this->api->getHttpData(),
+            $this->api->getHeaders()
+        );
     }
 
     /**
@@ -189,16 +194,213 @@ class Client implements RequestInterface, ResponseInterface
     }
 
     /**
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function originalResponseData(): string
+    {
+        return (string)$this->data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function responseArrayData(): array
+    {
+        return (array)json_decode($this->data, 1);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInvalid(): bool
+    {
+        return $this->getStatusCode() < 100 || $this->getStatusCode() >= 600;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInformational(): bool
+    {
+        return $this->getStatusCode() >= 100 && $this->getStatusCode() < 200;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSuccessful(): bool
+    {
+        return $this->getStatusCode() >= 200 && $this->getStatusCode() < 300;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRedirection(): bool
+    {
+        return $this->getStatusCode() >= 300 && $this->getStatusCode() < 400;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientError(): bool
+    {
+        return $this->getStatusCode() >= 400 && $this->getStatusCode() < 500;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isServerError(): bool
+    {
+        return $this->getStatusCode() >= 500 && $this->getStatusCode() < 600;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isOk(): bool
+    {
+        return 200 === $this->getStatusCode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isForbidden(): bool
+    {
+        return 403 === $this->getStatusCode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isNotFound(): bool
+    {
+        return 404 === $this->getStatusCode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty(): bool
+    {
+        return \in_array($this->getStatusCode(), [204, 304]);
+    }
+
+    /**
+     * 设置返回值
+     * @param $code
+     * @param $data
+     */
+    protected function setResponse($code, $data)
+    {
+        $this->statusCode = $code;
+        if ($code >= 200 and $code < 300) {
+            $this->data = $data;
+        }
+        if ($code >= 400 and $code < 600) {
+            $this->errorMessage = $data;
+        }
+    }
+
+    /**
+     * http请求
+     * @param $method
+     * @param $url
+     * @param $data
+     * @param $header
+     */
+    protected function httpRequest($method, $url, $data, $header)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
+        switch ($method) {
+            case 'head':
+            case 'get':
+                break;
+
+            case 'post':
+                    curl_setopt($ch, CURLOPT_POST, true);
+                   curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+                    break;
+
+            case 'put':
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    $data = array_merge($data, [
+                        '_method' => 'PUT',
+                    ]);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+                break;
+
+            case 'patch':
+                    curl_setopt($ch, CURLOPT_POST, true);
+
+                    $data = array_merge($data, [
+                        '_method' => 'PATCH',
+                    ]);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+                break;
+
+            case 'delete':
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    $data = array_merge($data, [
+                        '_method' => 'DELETE',
+                    ]);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+                break;
+        }
+
+        if (preg_match('/https:/', $url)) {
+            // 对认证证书来源的检查
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            // 从证书中检查SSL加密算法是否存在
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        }
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $data = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $this->setResponse($code, $data);
+        curl_close($ch);
+    }
+
+    /**
      * uri加签
      * @return string
      */
     protected function makeSignUri()
     {
         $uri = $this->api->getUri();
-        $queryParams = array_merge($this->api->getFilteredQueryParams(), [
+        $queryParams = array_merge(
+            $this->api->getFilteredQueryParams(),
+            [
                 'time' => time(),
                 'app_id' => static::$appId,
-                'sign_type' => 'md5'
+                'sign_type' => 'md5',
             ]
         );
 
@@ -209,7 +411,7 @@ class Client implements RequestInterface, ResponseInterface
         ));
 
         //如果是get请求方式，则将queryParams和httpData合并
-        if(in_array('GET', $this->api->getMethod())){
+        if (in_array('GET', $this->api->getMethod())) {
             $queryParams = array_merge(
                 $queryParams,
                 $this->api->getHttpData()
@@ -219,9 +421,8 @@ class Client implements RequestInterface, ResponseInterface
         if ($queryParams) {
             $queryParams = '?' . http_build_query($queryParams);
         }
+
         return $uri . $queryParams;
-
-
     }
 
     /**
@@ -237,105 +438,7 @@ class Client implements RequestInterface, ResponseInterface
             $str .= $k . $v;
         }
         $str .= static::$appSecret;
+
         return md5(base64_encode($str));
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function originalResponseData(): string
-    {
-        return (string)$this->response->getBody();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function responseArrayData(): array
-    {
-        return (array)json_decode($this->response->getBody(), 1);
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isInvalid(): bool
-    {
-        return $this->response->getStatusCode() < 100 || $this->response->getStatusCode() >= 600;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isInformational(): bool
-    {
-        return $this->response->getStatusCode() >= 100 && $this->response->getStatusCode() < 200;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSuccessful(): bool
-    {
-        return $this->response->getStatusCode() >= 200 && $this->response->getStatusCode() < 300;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isRedirection(): bool
-    {
-        return $this->response->getStatusCode() >= 300 && $this->response->getStatusCode() < 400;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isClientError(): bool
-    {
-        return $this->response->getStatusCode() >= 400 && $this->response->getStatusCode() < 500;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isServerError(): bool
-    {
-        return $this->response->getStatusCode() >= 500 && $this->response->getStatusCode() < 600;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isOk(): bool
-    {
-        return 200 === $this->response->getStatusCode();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isForbidden(): bool
-    {
-        return 403 === $this->response->getStatusCode();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isNotFound(): bool
-    {
-        return 404 === $this->response->getStatusCode();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isEmpty(): bool
-    {
-        return \in_array($this->response->getStatusCode(), [204, 304]);
-    }
-
-
 }

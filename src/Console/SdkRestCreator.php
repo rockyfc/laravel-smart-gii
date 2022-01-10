@@ -49,6 +49,7 @@ class SdkRestCreator extends GeneratorCommand
     {
         return (new SdkRestCreatorService())
             ->setClassName($this->argument('name'))
+            ->setSdkNamespace($this->argument('sdk_namespace'))
             ->setRoute($this->getRoute())
             ->getFileContent();
     }
@@ -98,6 +99,7 @@ class SdkRestCreator extends GeneratorCommand
         return [
             ['name', InputArgument::REQUIRED, 'Sdk相关类名称'],
             ['action', InputArgument::REQUIRED, '路由中的action项'],
+            ['sdk_namespace', InputArgument::REQUIRED, 'Sdk包命名空间'],
         ];
     }
 

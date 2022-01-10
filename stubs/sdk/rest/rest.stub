@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-use App\Sdk\Api;
+use {{ sdk_namespace }}\Api;
 
 class {{ class }} extends Api
 {
