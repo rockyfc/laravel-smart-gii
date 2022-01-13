@@ -73,10 +73,10 @@ class Client implements RequestInterface, ResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function send()
+    public function send($ttl = 0)
     {
         if (in_array('GET', $this->api->getMethod())) {
-            $this->get();
+            $this->get($ttl);
 
             return $this;
         }
@@ -109,14 +109,31 @@ class Client implements RequestInterface, ResponseInterface
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function get($ttl = 0)
     {
-        return $this->httpRequest(
+        $cacheKey = $this->getCacheKey($ttl);
+
+        if ($ttl > 0 and $data = Cache::get($cacheKey)) {
+            $this->data = $data['data'];
+            $this->statusCode = $data['code'];
+
+            return true;
+        }
+
+        $this->httpRequest(
             'get',
             $this->url(),
             $this->api->getHttpData(),
             $this->api->getHeaders()
         );
+
+        //存缓存
+        if ($ttl > 0 and $this->isSuccessful()) {
+            Cache::put($cacheKey, [
+                'data' => $this->data,
+                'code' => $this->statusCode,
+            ], $ttl);
+        }
     }
 
     /**
@@ -388,6 +405,26 @@ class Client implements RequestInterface, ResponseInterface
         curl_close($ch);
     }
 
+    protected function getCacheKey($ttl)
+    {
+        if ($ttl < 1) {
+            return '';
+        }
+        $uri = $this->api->getUri();
+        $queryParams = array_merge(
+            $this->api->getFilteredQueryParams(),
+            [
+                'app_id' => static::$appId,
+                'sign_type' => 'md5',
+            ]
+        );
+        if ($queryParams) {
+            $queryParams = '?' . http_build_query($queryParams);
+        }
+
+        return md5($uri . $queryParams) . $ttl;
+    }
+
     /**
      * uri加签
      * @return string
@@ -434,7 +471,12 @@ class Client implements RequestInterface, ResponseInterface
     {
         ksort($params);
         $str = '';
-        foreach ($params as $k => $v) {
+        foreach ($params as $k => &$v) {
+            if (is_array($v)) {
+                ksort($v);
+                $str .= $k . json_encode($v);
+                continue;
+            }
             $str .= $k . $v;
         }
         $str .= static::$appSecret;
@@ -442,3 +484,4 @@ class Client implements RequestInterface, ResponseInterface
         return md5(base64_encode($str));
     }
 }
+
