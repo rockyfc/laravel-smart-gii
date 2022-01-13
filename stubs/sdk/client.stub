@@ -4,6 +4,7 @@ namespace {{ namespace }};
 
 use {{ namespace }}\Contracts\RequestInterface;
 use {{ namespace }}\Contracts\ResponseInterface;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * http 客户端
