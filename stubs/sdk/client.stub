@@ -359,7 +359,7 @@ class Client implements RequestInterface, ResponseInterface
 
             case 'post':
                     curl_setopt($ch, CURLOPT_POST, true);
-                   curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
                     break;
 
@@ -368,7 +368,7 @@ class Client implements RequestInterface, ResponseInterface
                     $data = array_merge($data, [
                         '_method' => 'PUT',
                     ]);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
                 break;
 
@@ -378,7 +378,7 @@ class Client implements RequestInterface, ResponseInterface
                     $data = array_merge($data, [
                         '_method' => 'PATCH',
                     ]);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
                 break;
 
@@ -387,7 +387,7 @@ class Client implements RequestInterface, ResponseInterface
                     $data = array_merge($data, [
                         '_method' => 'DELETE',
                     ]);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
                 break;
         }
