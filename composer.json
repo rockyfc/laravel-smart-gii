@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2 || ^8.0",
         "laravel/framework": "^6.0|^7.0|^8.0",
         "rockyfc/laravel-smart-common": "^1.0",
         "barryvdh/reflection-docblock": "^2.0.6",
