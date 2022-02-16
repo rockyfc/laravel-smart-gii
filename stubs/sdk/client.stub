@@ -6,9 +6,9 @@ use {{ namespace }}\Contracts\RequestInterface;
 use {{ namespace }}\Contracts\ResponseInterface;
 use Illuminate\Support\Facades\Cache;
 
+
 /**
  * http 客户端
- * @package {{ namespace }};
  * @version 1.0
  */
 class Client implements RequestInterface, ResponseInterface
@@ -33,6 +33,11 @@ class Client implements RequestInterface, ResponseInterface
      * @var string 一个完整的带http的url
      */
     protected static $host;
+
+    /**
+     * @var array 公共参数字段名称
+     */
+    protected static $globalFields;
 
     /**
      * @var int 状态码
@@ -63,12 +68,19 @@ class Client implements RequestInterface, ResponseInterface
      * @param string $host
      * @param string $appId
      * @param string $appSecret
+     * @param string[] $globalFields
      */
-    public static function setApp(string $host, string $appId, string $appSecret)
+    public static function setApp(string $host, string $appId, string $appSecret, $globalFields = [
+        'time' => '_time',
+        'app_id' => '_app_id',
+        'sign' => '_sign',
+        'sign_type' => '_sign_type',
+    ])
     {
         static::$appId = $appId;
         static::$appSecret = $appSecret;
         static::$host = $host;
+        static::$globalFields = $globalFields;
     }
 
     /**
@@ -358,36 +370,36 @@ class Client implements RequestInterface, ResponseInterface
                 break;
 
             case 'post':
-                    curl_setopt($ch, CURLOPT_POST, true);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
-                    break;
+                break;
 
             case 'put':
-                    curl_setopt($ch, CURLOPT_POST, true);
-                    $data = array_merge($data, [
-                        '_method' => 'PUT',
-                    ]);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+                curl_setopt($ch, CURLOPT_POST, true);
+                $data = array_merge($data, [
+                    '_method' => 'PUT',
+                ]);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
                 break;
 
             case 'patch':
-                    curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POST, true);
 
-                    $data = array_merge($data, [
-                        '_method' => 'PATCH',
-                    ]);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+                $data = array_merge($data, [
+                    '_method' => 'PATCH',
+                ]);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
                 break;
 
             case 'delete':
-                    curl_setopt($ch, CURLOPT_POST, true);
-                    $data = array_merge($data, [
-                        '_method' => 'DELETE',
-                    ]);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+                curl_setopt($ch, CURLOPT_POST, true);
+                $data = array_merge($data, [
+                    '_method' => 'DELETE',
+                ]);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 
                 break;
         }
@@ -436,14 +448,14 @@ class Client implements RequestInterface, ResponseInterface
         $queryParams = array_merge(
             $this->api->getFilteredQueryParams(),
             [
-                'time' => time(),
-                'app_id' => static::$appId,
-                'sign_type' => 'md5',
+                static::$globalFields['time'] => time(),
+                static::$globalFields['app_id'] => static::$appId,
+                static::$globalFields['sign_type'] => 'md5',
             ]
         );
 
         //生成签名
-        $queryParams['sign'] = $this->makeMd5Sign(array_merge(
+        $queryParams[static::$globalFields['sign']] = $this->makeMd5Sign(array_merge(
             $queryParams,
             $this->api->getHttpData()
         ));
@@ -476,6 +488,7 @@ class Client implements RequestInterface, ResponseInterface
             if (is_array($v)) {
                 ksort($v);
                 $str .= $k . json_encode($v);
+
                 continue;
             }
             $str .= $k . $v;
@@ -485,4 +498,3 @@ class Client implements RequestInterface, ResponseInterface
         return md5(base64_encode($str));
     }
 }
-
