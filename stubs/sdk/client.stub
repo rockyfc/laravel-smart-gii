@@ -240,6 +240,18 @@ class Client implements RequestInterface, ResponseInterface
     }
 
     /**
+     * @return array|string[]
+     */
+    public function getArrayErrorMessage(): array
+    {
+        if ($errors = json_decode($this->errorMessage, true)) {
+            return $errors;
+        }
+
+        return [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function originalResponseData(): string
@@ -427,8 +439,8 @@ class Client implements RequestInterface, ResponseInterface
         $queryParams = array_merge(
             $this->api->getFilteredQueryParams(),
             [
-                'app_id' => static::$appId,
-                'sign_type' => 'md5',
+                static::$globalFields['app_id'] => static::$appId,
+                static::$globalFields['sign_type'] => 'md5',
             ]
         );
         if ($queryParams) {
