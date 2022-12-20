@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
  * 创建一个RequestForm类
  * @author Rocky<softfc@163.com>
  */
-class RequestFormCreator extends GeneratorCommand
+class RequestFormCreator extends BaseCreator
 {
     /**
      * The console command name.

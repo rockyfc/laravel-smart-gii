@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
  * 创建一个资源类
  * @author Rocky<softfc@163.com>
  */
-class ResourceCreator extends GeneratorCommand
+class ResourceCreator extends BaseCreator
 {
     /**
      * The console command name.

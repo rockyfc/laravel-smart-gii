@@ -4,7 +4,7 @@ namespace Smart\Gii\Console;
 
 use Illuminate\Console\Command;
 
-class InstallCommand extends Command
+class InstallCommand extends BaseCreator
 {
     /**
      * The name and signature of the console command.

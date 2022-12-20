@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
  * Class SdkRestCreator
  * @author Rocky<softfc@163.com>
  */
-class SdkRestCreator extends GeneratorCommand
+class SdkRestCreator extends BaseCreator
 {
     /**
      * @var string

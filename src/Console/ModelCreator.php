@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @author Rocky<softfc@163.com>
  */
-class ModelCreator extends GeneratorCommand
+class ModelCreator extends BaseCreator
 {
     /**
      * @var string

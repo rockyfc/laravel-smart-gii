@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @author Rocky<softfc@163.com>
  */
-class SdkCreator extends GeneratorCommand
+class SdkCreator extends BaseCreator
 {
     /**
      * @var string

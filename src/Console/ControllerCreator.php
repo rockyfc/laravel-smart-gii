@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @author Rocky<softfc@163.com>
  */
-class ControllerCreator extends GeneratorCommand
+class ControllerCreator extends BaseCreator
 {
     /**
      * The console command name.

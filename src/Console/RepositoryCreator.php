@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
  * 创建一个Repository类
  * @author Rocky<softfc@163.com>
  */
-class RepositoryCreator extends GeneratorCommand
+class RepositoryCreator extends BaseCreator
 {
     /**
      * The console command name.
