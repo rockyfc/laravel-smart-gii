@@ -252,7 +252,11 @@ class RequestFormCreatorService
         $primaryKey = $model->getKeyName();
         if (is_string($primaryKey)) {
             $stub = str_replace('{{ sorts }}', '\'-' . $primaryKey . '\'', $stub);
+            return $this;
         }
+
+        $stub = str_replace('{{ sorts }}',  '', $stub);
+
 
         return $this;
     }
