@@ -33,7 +33,7 @@ class {{ class }} extends {{ baseClassName }} implements SmartModel
      * 模型主键
      * @var string
      */
-    protected $primaryKey = '{{ primaryKey }}';
+    protected $primaryKey = {{ primaryKey }};
 
     /**
      * 属性白名单，设置允许被修改的属性，它同$guarded正好相反，同时只允许设置其中一个。

@@ -20,7 +20,7 @@ class CtrlRepository extends BaseRepository
      * 路由格式代码
      * @var
      */
-    protected $routeStyleCode;
+    protected $routeStyleCode = [];
 
     /**
      * 检查文件，返回一个检查结果数组
@@ -78,7 +78,14 @@ class CtrlRepository extends BaseRepository
             $repositoryClass
         )->getRouteName();
 
-        $this->routeStyleCode = "Route::resource('prefix_name/" . $this->routeName . "', '{$controllerClass}')->only(['index', 'show', 'store', 'update', 'destroy']);";
+        // $this->routeStyleCode = "Route::resource('prefix_name/" . $this->routeName . "', '{$controllerClass}')->only(['index', 'show', 'store', 'update', 'destroy']);";
+
+        $routePrefix = strtolower(Str::snake($this->routeName, '-'));
+        $this->routeStyleCode[0] = "Route::get('{$routePrefix}/index', ['{$controllerClass}', 'index'])->name('{$routePrefix}.index');";
+        $this->routeStyleCode[1] = "Route::get('{$routePrefix}/show/{" . $this->routeName . "}', ['{$controllerClass}', 'show'])->name('{$routePrefix}.show');";
+        $this->routeStyleCode[2] = "Route::post('{$routePrefix}/store', ['{$controllerClass}', 'store'])->name('{$routePrefix}.store');";
+        $this->routeStyleCode[3] = "Route::put('{$routePrefix}/update/{" . $this->routeName . "}', ['{$controllerClass}', 'update'])->name('{$routePrefix}.update');";
+        $this->routeStyleCode[4] = "Route::delete('{$routePrefix}/destroy/{" . $this->routeName . "}', ['{$controllerClass}', 'destroy'])->name('{$routePrefix}.destroy');";
 
         try {
             return $this->getFilePathByClassName($controllerClass);

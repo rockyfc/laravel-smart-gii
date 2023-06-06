@@ -3,15 +3,15 @@
 return [
     'domain' => env('SMART_GII_DOMAIN', null),
 
-    //是否启用gii
+    // 是否启用gii
     'enabled' => env('SMART_GII_ENABLED', true),
 
-    //gii路由前缀。提高gii路由的可辨识性，降低与其他路由重合的可能性。
+    // gii路由前缀。提高gii路由的可辨识性，降低与其他路由重合的可能性。
     'prefix' => env('SMART_GII_ROUTE_PREFIX', 'smart-gii'),
 
-    //后缀
+    // 后缀
     'suffix' => [
-        //生成类文件的时候为类文件提供一个命名建议
+        // 生成类文件的时候为类文件提供一个命名建议
         'class' => [
             'controller' => env('SMART_GII_CONTROLLER_SUFFIX', 'Controller'),
             'resource' => env('SMART_GII_RESOURCE_SUFFIX', 'Resource'),
@@ -21,14 +21,14 @@ return [
         ],
     ],
 
-    'model_path'=>[
-        app_path().'/Models'
+    'model_path' => [
+        app_path() . '/Models',
     ],
 
-    //允许使用本插件的运行环境
-    'allowed_env'=>[
+    // 允许使用本插件的运行环境
+    'allowed_env' => [
         'local',
-        'dev'
+        'dev',
     ],
 
     'middleware' => [

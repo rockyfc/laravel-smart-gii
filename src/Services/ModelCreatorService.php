@@ -71,8 +71,8 @@ class ModelCreatorService extends BaseService
 
     /**
      * 获取要创建的文件内容
-     * @return string
      * @throws FileNotFoundException
+     * @return string
      */
     public function getFileContent()
     {
@@ -154,8 +154,8 @@ class ModelCreatorService extends BaseService
 
     /**
      * @param string $name
-     * @return string
      * @throws FileNotFoundException
+     * @return string
      */
     protected function buildClass($name)
     {
@@ -166,7 +166,7 @@ class ModelCreatorService extends BaseService
             ->replaceConnection($stub)
             ->replaceProperties($stub)
             ->replaceAttributes($stub)
-            //->replaceAttributesConvert($stub)
+            // ->replaceAttributesConvert($stub)
             ->replaceRules($stub)
             ->replaceGuarded($stub)
             ->replaceTimestamps($stub)
@@ -226,7 +226,7 @@ class ModelCreatorService extends BaseService
     /**
      * Get the model for the default guard's user provider.
      *
-     * @return null|string
+     * @return string|null
      */
     protected function userProviderModel()
     {
@@ -337,13 +337,14 @@ class ModelCreatorService extends BaseService
         $str = '';
         if (is_array($pk)) {
             if (1 == count($pk)) {
-                $str = $pk[0];
+                $str = "'".$pk[0]."'";
             } else {
                 $str = '';
                 foreach ($pk as $val) {
                     $str .= "'" . $val . "',";
                 }
                 $str = '[' . trim($str, ',') . ']';
+                $str = str_replace(',',', ',$str);
             }
         }
         $stub = str_replace(['{{ primaryKey }}', '{{primaryKey}}'], $str, $stub);
@@ -416,7 +417,7 @@ class ModelCreatorService extends BaseService
                 $rule[] = 'max:' . $column->getLength();
             }
 
-            //$rules[$column->getName()] = implode('|', $rule);
+            // $rules[$column->getName()] = implode('|', $rule);
             $rules[$column->getName()] = $rule;
         }
 
@@ -600,7 +601,7 @@ class ModelCreatorService extends BaseService
         $str = "[\r\n";
         foreach ($array as $k => $val) {
             if (null === $val or (is_array($val) and null === $val['value'])) {
-                $str .= $prefix . "        '" . $k . "' => " . "null,\r\n";
+                $str .= $prefix . "        '" . $k . "' => null,\r\n";
 
                 continue;
             }
@@ -618,12 +619,12 @@ class ModelCreatorService extends BaseService
             }
 
             if (is_array($val) and in_array($val['type'], [
-                    Type::INTEGER,
-                    Type::BIGINT,
-                    Type::SMALLINT,
-                    Type::FLOAT,
-                    Type::DECIMAL,
-                ])) {
+                Type::INTEGER,
+                Type::BIGINT,
+                Type::SMALLINT,
+                Type::FLOAT,
+                Type::DECIMAL,
+            ])) {
                 $str .= $prefix . "        '" . $k . "' => " . $val['value'] . ",\r\n";
 
                 continue;

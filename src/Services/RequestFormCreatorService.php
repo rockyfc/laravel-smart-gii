@@ -3,6 +3,7 @@
 namespace Smart\Gii\Services;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Smart\Common\Helpers\Tools;
@@ -52,8 +53,8 @@ class RequestFormCreatorService
 
     /**
      * 获取要创建的文件内容
-     * @return mixed
      * @throws FileNotFoundException
+     * @return mixed
      */
     public function getFileContent()
     {
@@ -62,8 +63,8 @@ class RequestFormCreatorService
 
     /**
      * @param $name
-     * @return mixed
      * @throws FileNotFoundException
+     * @return mixed
      */
     protected function buildClass($name)
     {
@@ -72,6 +73,9 @@ class RequestFormCreatorService
         return $this->replaceNamespace($stub, $name)
             ->replaceModelClass($stub)
             ->replaceRules($stub)
+            ->replaceStoreRules($stub)
+            ->replaceUpdateRules($stub)
+            ->replaceSorts($stub)
             ->replaceClass($stub, $name);
     }
 
@@ -118,7 +122,7 @@ class RequestFormCreatorService
         $modelClass = $this->modelClass;
         $modelClassName = str_replace($this->getNamespace($this->modelClass) . '\\', '', $this->modelClass);
 
-        //如果model名和request form的类名相同的话，稍做改变
+        // 如果model名和request form的类名相同的话，稍做改变
         if ($this->isSameWithModel($modelClassName)) {
             $modelClassName = $modelClassName . 'Model';
             $modelClass = $modelClass . ' as ' . $modelClassName;
@@ -131,7 +135,7 @@ class RequestFormCreatorService
     }
 
     /**
-     * @return Attributes|SmartModel
+     * @return Attributes|SmartModel|Model
      */
     protected function newModelInstance()
     {
@@ -150,12 +154,22 @@ class RequestFormCreatorService
             $model->fillableAttributesRules()
         );
 
-        //首先过滤出以"id"结尾的字段
+        // 首先过滤出以"id"结尾的字段
         $arr = array_filter($rules, function ($attribute) {
             return Str::endsWith($attribute, 'id');
         }, ARRAY_FILTER_USE_KEY);
 
-        //如果以"id"结尾的字段不足10个，则再挑选出integer类型的字段
+        // 如果以"id"结尾的字段不足10个，则再挑选出name结尾的字段
+        if (count($arr) < 10) {
+            $arr = array_merge(
+                $arr,
+                array_filter($rules, function ($attribute) {
+                    return Str::endsWith($attribute, 'name');
+                }, ARRAY_FILTER_USE_KEY)
+            );
+        }
+
+        // 如果以"id"结尾的字段不足10个，则再挑选出integer类型的字段
         if (count($arr) < 10) {
             $arr = array_merge(
                 $arr,
@@ -164,15 +178,6 @@ class RequestFormCreatorService
                 }, ARRAY_FILTER_USE_BOTH)
             );
         }
-
-        //如果以"id"结尾的字段不足10个，则再挑选出integer类型的字段
-        /*if (count($arr) < 10) {
-            $arr = array_merge(
-                $arr,
-                array_filter($rules, function ($rule, $attribute) use ($arr) {
-                    return (in_array('string', $rule) and !in_array($attribute, $arr));
-                }, ARRAY_FILTER_USE_BOTH));
-        }*/
 
         $arr = array_slice($arr, 0, 10);
 
@@ -183,19 +188,93 @@ class RequestFormCreatorService
     }
 
     /**
+     * 替换模板中的{{ storeRules }}标签
+     * @param $stub
+     * @return $this
+     */
+    protected function replaceStoreRules(&$stub)
+    {
+        $model = $this->newModelInstance();
+        $rules = (array)$model->fillableAttributesRules();
+        $rules = Tools::removeNullableForRules($rules);
+
+        // 首先过滤出model 自动管理的事件字段
+        $arr = array_filter($rules, function ($attribute) {
+            if (Model::CREATED_AT === $attribute or Model::UPDATED_AT == $attribute) {
+                return false;
+            }
+
+            return true;
+        }, ARRAY_FILTER_USE_KEY);
+
+        $str = $this->rulesArrayToString($arr, "\t", false);
+        $stub = str_replace('{{ storeRules }}', $str, $stub);
+
+        return $this;
+    }
+
+    /**
+     * 替换模板中的{{ updateRules }}标签
+     * @param $stub
+     * @return $this
+     */
+    protected function replaceUpdateRules(&$stub)
+    {
+        $model = $this->newModelInstance();
+        $rules = (array)Tools::removeRequiredForRules(
+            $model->fillableAttributesRules()
+        );
+        $rules = Tools::removeNullableForRules($rules);
+
+        // 首先过滤出model 自动管理的事件字段
+        $arr = array_filter($rules, function ($attribute) {
+            if (Model::CREATED_AT === $attribute or Model::UPDATED_AT == $attribute) {
+                return false;
+            }
+
+            return true;
+        }, ARRAY_FILTER_USE_KEY);
+
+        $str = $this->rulesArrayToString($arr, "\t", false);
+        $stub = str_replace('{{ updateRules }}', $str, $stub);
+
+        return $this;
+    }
+
+    /**
+     * 替换模板中的{{ sorts }}标签
+     * @param $stub
+     * @return $this
+     */
+    protected function replaceSorts(&$stub)
+    {
+        $model = $this->newModelInstance();
+        $primaryKey = $model->getKeyName();
+        if (is_string($primaryKey)) {
+            $stub = str_replace('{{ sorts }}', '\'-' . $primaryKey . '\'', $stub);
+        }
+
+        return $this;
+    }
+
+    /**
      * 将rules规则转化成可输出的字符串
      * @param $rules
-     * @param $prefix
+     * @param string $prefix
+     * @param bool $nullable
      * @return string
      */
-    protected function rulesArrayToString($rules, $prefix = '')
+    protected function rulesArrayToString($rules, $prefix = '', $nullable = true)
     {
         $str = "[\n";
         foreach ($rules as $name => $val) {
             if (is_string($val)) {
                 $val = explode('|', $val);
             }
-            $val = array_merge(['nullable'], $val);
+            if ($nullable) {
+                $val = array_merge(['nullable'], $val);
+            }
+
             $str .= $prefix . "\t\t'" . $name . "' => [";
             foreach ($val as $k => $v) {
                 $str .= "'" . $v . "', ";

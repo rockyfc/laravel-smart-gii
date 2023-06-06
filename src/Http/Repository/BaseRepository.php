@@ -24,8 +24,8 @@ class BaseRepository
     /**
      * 根据类名获取类文件的路径
      * @param $class
-     * @return false|string
      * @throws \ReflectionException
+     * @return false|string
      */
     public function getFilePathByClassName($class)
     {

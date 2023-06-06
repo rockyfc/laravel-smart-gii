@@ -138,9 +138,11 @@
 
 
                     let fillResult=function(data){
-                        let str = "请将如下代码添加到路由文件中：\n```php\n";
-                        str += data.code+"\n```\n";
-                        str += "其中前prefix_name根据实际情况命名，可以省略。\n\n";
+                        let str = "请将如下代码添加到路由文件中：\n```php\n\n";
+                        for (let i in data.code) {
+                           str += data.code[i] + "\n";
+                        }
+                        str += "\n```\n\n";
                         for (let i in data.files) {
                             if (data.files[i].isDone == true) {
                                 str += data.files[i].file + " 创建成功\n";

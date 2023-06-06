@@ -12,34 +12,39 @@ use Illuminate\Database\Eloquent\Model;
 trait ModelTrait
 {
     /**
+     * @var Model
+     */
+    public $modelInstance;
+
+    /**
      * 数据库中的数据类型和php语法中定义的类型的对应关系
      */
     protected $phpTypes = [
-        Types::ARRAY => 'string', //'array';
-        Types::ASCII_STRING => 'string', //'ascii_string';
-        Types::BIGINT => 'int', //'bigint';
-        Types::BINARY => 'string', //'binary';
-        Types::BLOB => 'string', //'blob';
-        Types::BOOLEAN => 'string', //'boolean';
-        Types::DATE_MUTABLE => 'string', //'date';
-        Types::DATE_IMMUTABLE => 'string',// 'date_immutable';
-        Types::DATEINTERVAL => 'string', //'dateinterval';
-        Types::DATETIME_MUTABLE => 'string',// 'datetime'
-        Types::DATETIME_IMMUTABLE => 'string',// 'datetime_immutable';
-        Types::DATETIMETZ_MUTABLE => 'string',// 'datetimetz';
+        Types::ARRAY => 'string', // 'array';
+        Types::ASCII_STRING => 'string', // 'ascii_string';
+        Types::BIGINT => 'int', // 'bigint';
+        Types::BINARY => 'string', // 'binary';
+        Types::BLOB => 'string', // 'blob';
+        Types::BOOLEAN => 'string', // 'boolean';
+        Types::DATE_MUTABLE => 'string', // 'date';
+        Types::DATE_IMMUTABLE => 'string', // 'date_immutable';
+        Types::DATEINTERVAL => 'string', // 'dateinterval';
+        Types::DATETIME_MUTABLE => 'string', // 'datetime'
+        Types::DATETIME_IMMUTABLE => 'string', // 'datetime_immutable';
+        Types::DATETIMETZ_MUTABLE => 'string', // 'datetimetz';
         Types::DATETIMETZ_IMMUTABLE => 'string', // 'datetimetz_immutable';
-        Types::DECIMAL => 'float', //'decimal';
-        Types::FLOAT => 'float', //'float';
-        Types::GUID => 'string', //'guid';
-        Types::INTEGER => 'int', //'integer';
-        Types::JSON => 'string', //'json';
-        Types::OBJECT => 'string', //'object';
-        Types::SIMPLE_ARRAY => 'string', //'simple_array';
-        Types::SMALLINT => 'int', //'smallint';
-        Types::STRING => 'string', //'string';
-        Types::TEXT => 'string', //'text';
-        Types::TIME_MUTABLE => 'string', //'time';
-        Types::TIME_IMMUTABLE => 'string',// 'time_immutable';];
+        Types::DECIMAL => 'float', // 'decimal';
+        Types::FLOAT => 'float', // 'float';
+        Types::GUID => 'string', // 'guid';
+        Types::INTEGER => 'int', // 'integer';
+        Types::JSON => 'string', // 'json';
+        Types::OBJECT => 'string', // 'object';
+        Types::SIMPLE_ARRAY => 'string', // 'simple_array';
+        Types::SMALLINT => 'int', // 'smallint';
+        Types::STRING => 'string', // 'string';
+        Types::TEXT => 'string', // 'text';
+        Types::TIME_MUTABLE => 'string', // 'time';
+        Types::TIME_IMMUTABLE => 'string', // 'time_immutable';];
     ];
 
     /**
@@ -53,13 +58,8 @@ trait ModelTrait
     }
 
     /**
-     * @var Model
-     */
-    public $modelInstance;
-
-    /**
-     * @return AbstractSchemaManager
      * @throws Exception
+     * @return AbstractSchemaManager
      */
     protected function getSchema()
     {
@@ -75,8 +75,8 @@ trait ModelTrait
     }
 
     /**
-     * @return Column[]
      * @throws Exception
+     * @return Column[]
      */
     protected function getTableColumns()
     {

@@ -3,7 +3,6 @@
 namespace Smart\Gii\Console;
 
 use Doctrine\DBAL\Types\Type;
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Smart\Gii\Services\RequestFormCreatorService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -38,7 +37,7 @@ class RequestFormCreator extends BaseCreator
 
     /**
      * @throws FileNotFoundException
-     * @return null|bool
+     * @return bool|null
      */
     public function handle()
     {

@@ -69,12 +69,13 @@ class SdkController extends Controller
      */
     public function download(Request $request)
     {
-        $file = $request->input('file') or die('file params is missing');
+        $file = $request->input('file') or exit('file params is missing');
         $target = str_replace('//', '/', $this->repository->getBasePath() . $file);
 
         if (file_exists($target)) {
             return response()->download($target);
         }
-        die('没有找到文件' . $file);
+
+        exit('没有找到文件' . $file);
     }
 }

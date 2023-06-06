@@ -3,7 +3,6 @@
 namespace Smart\Gii\Services;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Smart\Common\Helpers\Tools;
@@ -63,8 +62,8 @@ class RepositoryCreatorService extends BaseService
     /**
      * 获取要创建的文件内容
      *
-     * @return mixed
      * @throws FileNotFoundException
+     * @return mixed
      */
     public function getFileContent()
     {
@@ -75,8 +74,8 @@ class RepositoryCreatorService extends BaseService
 
     /**
      * @param $name
-     * @return mixed
      * @throws FileNotFoundException
+     * @return mixed
      */
     protected function buildClass($name)
     {
@@ -153,7 +152,7 @@ class RepositoryCreatorService extends BaseService
         $modelClass = $this->modelClass;
         $modelClassName = str_replace($this->getNamespace($this->modelClass) . '\\', '', $this->modelClass);
 
-        //如果model名和request form的类名相同的话，稍做改变
+        // 如果model名和request form的类名相同的话，稍做改变
         if ($this->isSameWithModel($modelClassName)) {
             $modelClassName = $modelClassName . 'Model';
             $modelClass = $modelClass . ' as ' . $modelClassName;
@@ -208,7 +207,7 @@ class RepositoryCreatorService extends BaseService
             $model->attributesRules()
         );
 
-        //首先过滤出以"id"结尾的字段
+        // 首先过滤出以"id"结尾的字段
         $arr = array_filter($rules, function ($attribute) {
             return Str::endsWith($attribute, 'id');
         }, ARRAY_FILTER_USE_KEY);

@@ -1,0 +1,35 @@
+<table class="table table-hover">
+    <thead>
+        <tr>
+            {{ titleHtml }}
+        </tr>
+    </thead>
+    <tbody>
+    @foreach($data->items() as $name=>$item)
+        <tr>
+            {{ contentHtml }}
+        </tr>
+    @endforeach
+    </tbody>
+</table>
+
+<ul class="pagination">
+    @foreach($data->linkCollection() as $name=>$page)
+        <li class="@if($page['active']==1) active @elseif($page['url']=='') disabled @endif
+                @if(preg_match('/Prev/',$page['label'])) prev @endif
+                @if(preg_match('/Next/',$page['label'])) next @endif
+                ">
+            <a href="{{$page['url']}}" data-page="{{$page['label']}}">{!! $page['label'] !!}</a>
+        </li>
+    @endforeach
+</ul>
+<div class="summary">第<b>{{$data->firstItem()}}-{{$data->lastItem()}}</b>条，共<b>{{$data->total()}}</b>条数据.</div>
+<div class='clear'></div>
+<style>
+    .summary {
+        color: #666;
+        margin-top: 7px;
+        float: right;
+        margin-left: 10px;
+    }
+</style>

@@ -7,14 +7,14 @@
             <small> </small>
         </h3>
         <p>
-            该生成器可为您快速生成一个Api Controller类，并且实现增、删、改、查等方法，
+            该生成器可为您快速生成一个View Controller类，并且实现增、删、改、查等方法，
             您也可以在添加一些其他的自定义方法。
             请确定您在使用之前已经创建了相应的Eloquent Model、 Request Form和Resource资源类。
         </p>
     </div>
 
 
-    <form method="post" action="{{route("gii.ctrl.preview")}}">
+    <form method="post" action="{{route("gii.view-ctrl.preview")}}">
 
         <div class="form-group">
             <label for="ctrl">Controller 类</label>
@@ -40,8 +40,8 @@
             <span class="help-block"></span>
         </div>
         <div class="form-group">
-            <label for="resource">Resource 类</label>
-            <input type="text" class="form-control" name="resource" id="resource" placeholder=""
+            <label for="resource">Views 视图</label>
+            <input type="text" class="form-control" name="viewPath" id="viewPath" placeholder=""
                    value="">
             <span class="help-block"></span>
         </div>
@@ -92,7 +92,7 @@
             },
             preview: function (form) {
                 Current.init();
-                form.action = '{{route("gii.ctrl.preview")}}';
+                form.action = '{{route("gii.view-ctrl.preview")}}';
                 AppRequest.submitForm(form, function (response) {
                     console.log('response = ', response);
                     $('#fc-files').removeClass('hidden');
@@ -103,18 +103,16 @@
 
             },
             generate: function (form) {
-                form.action = '{{route("gii.ctrl.generate")}}';
+                form.action = '{{route("gii.view-ctrl.generate")}}';
                 AppRequest.submitForm(form, function (response) {
                     console.log('response = ', response);
                     Current.init();
 
 
                     let fillResult=function(data){
-                        let str = "请将如下代码添加到路由文件中：\n```php\n\n";
-                        for (let i in data.code) {
-                            str += data.code[i] + "\n";
-                        }
-                        str += "\n\n```\n\n";
+                        let str = "请将如下代码添加到路由文件中：\n```php\n";
+                        str += data.code+"\n```\n";
+                        str += "其中前prefix_name根据实际情况命名，可以省略。\n\n";
                         for (let i in data.files) {
                             if (data.files[i].isDone == true) {
                                 str += data.files[i].file + " 创建成功\n";

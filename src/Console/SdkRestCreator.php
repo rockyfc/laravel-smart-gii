@@ -2,7 +2,6 @@
 
 namespace Smart\Gii\Console;
 
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Routing\Route;
 use Smart\Common\Services\DocService;
@@ -33,7 +32,7 @@ class SdkRestCreator extends BaseCreator
 
     /**
      * @throws FileNotFoundException
-     * @return null|bool
+     * @return bool|null
      */
     public function handle()
     {

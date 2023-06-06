@@ -132,7 +132,7 @@ class ResourceCreatorService extends BaseService
         $modelClass = $this->modelClass;
         $modelClassName = str_replace($this->getNamespace($modelClass) . '\\', '', $modelClass);
 
-        //如果model名和request form的类名相同的话，稍做改变
+        // 如果model名和request form的类名相同的话，稍做改变
         if ($this->isSameWithModel($modelClassName)) {
             $modelClassName = $modelClassName . 'Model';
             $modelClass = $modelClass . ' as ' . $modelClassName;
@@ -221,9 +221,9 @@ class ResourceCreatorService extends BaseService
 
         $str = '';
         foreach ($columns as $col) {
-            //$type = trim($col->getType(), '\\');
+            // $type = trim($col->getType(), '\\');
             $str .= "            '" . $col->getName() . "' => " . '$this->' . $col->getName() . ",\n";
-            //$str .= " * @property {$type} $" . $col->getName() . " {$col->getComment()}\n";
+            // $str .= " * @property {$type} $" . $col->getName() . " {$col->getComment()}\n";
         }
 
         $stub = str_replace(['{{ attributes }}', '{{attributes}}'], $str, $stub);

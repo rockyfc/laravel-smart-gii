@@ -2,7 +2,6 @@
 
 namespace Smart\Gii\Console;
 
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Smart\Gii\Services\ResourceCreatorService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -37,7 +36,7 @@ class ResourceCreator extends BaseCreator
 
     /**
      * @throws FileNotFoundException
-     * @return null|bool|void
+     * @return bool|void|null
      */
     public function handle()
     {

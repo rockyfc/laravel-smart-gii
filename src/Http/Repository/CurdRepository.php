@@ -44,7 +44,7 @@ class CurdRepository extends BaseRepository
         $ctrlRepository = new CtrlRepository();
         $result = [];
 
-        //生成controller class
+        // 生成controller class
         if ($controllerClass && $this->inArray($controllerClass, $classes)) {
             if ($file = $ctrlRepository->runCommand($controllerClass, $baseClass, $formClass, $resourceClass, $modelClass, $repositoryClass)) {
                 $result[] = ['isDone' => true, 'file' => $file];
@@ -53,7 +53,7 @@ class CurdRepository extends BaseRepository
             }
         }
 
-        //生成form class
+        // 生成form class
         if ($formClass && $this->inArray($formClass, $classes)) {
             if ($file = (new FormRepository())->runCommand($formClass, $modelClass)) {
                 $result[] = ['isDone' => true, 'file' => $file];
@@ -62,7 +62,7 @@ class CurdRepository extends BaseRepository
             }
         }
 
-        //生成resource class
+        // 生成resource class
         if ($resourceClass && $this->inArray($resourceClass, $classes)) {
             if ($file = (new ResourceRepository())->runCommand($resourceClass, $modelClass)) {
                 $result[] = ['isDone' => true, 'file' => $file];
@@ -71,7 +71,7 @@ class CurdRepository extends BaseRepository
             }
         }
 
-        //生成repository class
+        // 生成repository class
         if ($repositoryClass && $this->inArray($repositoryClass, $classes)) {
             if ($file = (new RepositoryRepository())->runCommand($repositoryClass, $modelClass)) {
                 $result[] = ['isDone' => true, 'file' => $file];

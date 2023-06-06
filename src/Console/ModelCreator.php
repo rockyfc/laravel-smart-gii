@@ -3,7 +3,6 @@
 namespace Smart\Gii\Console;
 
 use Doctrine\DBAL\DBALException;
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Smart\Gii\Services\ModelCreatorService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -33,7 +32,7 @@ class ModelCreator extends BaseCreator
 
     /**
      * @throws FileNotFoundException
-     * @return null|bool
+     * @return bool|null
      */
     public function handle()
     {

@@ -165,7 +165,7 @@ class SdkCreatorService extends BaseService
      */
     protected function getStub()
     {
-        //print_r(static::stubs($this->package));
+        // print_r(static::stubs($this->package));
         $stub = static::stubs($this->package)[$this->className];
 
         return $this->resolveStubPath($stub);

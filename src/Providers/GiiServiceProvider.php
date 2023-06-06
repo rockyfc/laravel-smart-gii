@@ -27,7 +27,7 @@ class GiiServiceProvider extends ServiceProvider
             return;
         }
 
-        if(!in_array(app()->environment(),ConfigService::allowedEnv())){
+        if (!in_array(app()->environment(), ConfigService::allowedEnv())) {
             return;
         }
 
@@ -109,7 +109,7 @@ class GiiServiceProvider extends ServiceProvider
             'domain' => ConfigService::domain(),
             'namespace' => 'Smart\Gii\Http\Controllers',
             'prefix' => ConfigService::prefix(),
-            'middleware' => 'web'
+            'middleware' => 'web',
         ];
     }
 }

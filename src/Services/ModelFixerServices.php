@@ -26,9 +26,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\ContextFactory;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionObject;
 use Smart\Gii\Traits\ModelTrait;
 
 class ModelFixerServices
@@ -52,7 +49,7 @@ class ModelFixerServices
     protected $modelClass;
 
     /**
-     * @var ReflectionClass
+     * @var \ReflectionClass
      */
     protected $reflection;
 
@@ -67,29 +64,32 @@ class ModelFixerServices
     protected $dateClass;
 
     /**
+     * 是否完全重置注释内容
+     * @var bool
+     */
+    protected $isReset = false;
+
+    protected $originComment;
+
+    protected $properties = [];
+
+    /**
      * ModelResolverService constructor.
      * @param string $modelClass
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws BindingResolutionException
      */
     public function __construct(string $modelClass)
     {
         $this->modelClass = $modelClass;
-        $this->reflection = new ReflectionClass($modelClass);
+        $this->reflection = new \ReflectionClass($modelClass);
         $this->file = new Filesystem();
         $this->modelInstance();
-
 
         $this->dateClass = class_exists(\Illuminate\Support\Facades\Date::class)
             ? '\\' . get_class(\Illuminate\Support\Facades\Date::now())
             : '\Illuminate\Support\Carbon';
     }
-
-    /**
-     * 是否完全重置注释内容
-     * @var bool
-     */
-    protected $isReset = false;
 
     /**
      * @param bool $isReset
@@ -98,19 +98,17 @@ class ModelFixerServices
     public function setIsReset(bool $isReset = false)
     {
         $this->isReset = $isReset;
+
         return $this;
     }
 
-
     public function fix()
     {
-        //根据phpdoc对象重新设置model的类注释
+        // 根据phpdoc对象重新设置model的类注释
         return $this->setModelFileContent(
             $this->getNewComment()
         );
     }
-
-    protected $originComment;
 
     /**
      * 获取原注释内容
@@ -121,25 +119,26 @@ class ModelFixerServices
         if (!$this->originComment) {
             $this->originComment = (string)$this->reflection->getDocComment();
         }
+
         return $this->originComment;
     }
 
     /**
      * 获取新的注释内容
-     * @return string
      * @throws BindingResolutionException
      * @throws Exception
-     * @throws ReflectionException
+     * @throws \ReflectionException
+     * @return string
      */
     public function getNewComment()
     {
-        //将所有需要设置的property统一整理
+        // 将所有需要设置的property统一整理
         $this->setProperties();
 
-        //获取一个可写的phpdoc对象
+        // 获取一个可写的phpdoc对象
         $phpdoc = $this->getPhpDocForWrite();
 
-        //将properties写入phpdoc
+        // 将properties写入phpdoc
         $this->writeDocumentWithProperties($phpdoc);
 
         $serializer = new DocBlockSerializer();
@@ -148,10 +147,24 @@ class ModelFixerServices
     }
 
     /**
+     * 获取一个model对象
+     * @throws BindingResolutionException
+     * @return Model|mixed
+     */
+    public function modelInstance()
+    {
+        if (!$this->modelInstance) {
+            $this->modelInstance = app()->make($this->modelClass);
+        }
+
+        return $this->modelInstance;
+    }
+
+    /**
      * 设置类属性
      * @throws BindingResolutionException
      * @throws Exception
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     protected function setProperties()
     {
@@ -190,6 +203,7 @@ class ModelFixerServices
 
             if (!in_array($name, $this->properties)) {
                 $phpdoc->deleteTag($tag);
+
                 continue;
             }
 
@@ -198,9 +212,8 @@ class ModelFixerServices
             }
         }
 
-
         foreach ($this->properties as $name => $property) {
-            $name = "\$$name";
+            $name = "\${$name}";
 
             if (in_array($name, $properties)) {
                 continue;
@@ -222,7 +235,6 @@ class ModelFixerServices
 
         return $phpdoc;
     }
-
 
     /**
      * 从数据表获取property
@@ -247,11 +259,10 @@ class ModelFixerServices
         }
     }
 
-
     /**
      * 从方法中获取property
      * @throws BindingResolutionException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     protected function setPropertiesFromMethods()
     {
@@ -260,27 +271,28 @@ class ModelFixerServices
         sort($methods);
 
         foreach ($methods as $method) {
-
-            //Magic get<name>Attribute
+            // Magic get<name>Attribute
             if ($this->isGetAttributeMethod($method)) {
                 $this->setPropertiesFromGetAttributeMethods($method);
+
                 continue;
             }
 
-            //Magic set<name>Attribute
+            // Magic set<name>Attribute
             if ($this->isSetAttributeMethod($method)) {
                 $this->setPropertiesFromSetAttributeMethods($method);
+
                 continue;
             }
 
-            //Magic Relation Method
+            // Magic Relation Method
             if ($this->isRelationMethod($method)) {
                 $this->setPropertiesFromRelationMethod($method);
+
                 continue;
             }
         }
     }
-
 
     /**
      * @throws BindingResolutionException
@@ -316,11 +328,10 @@ class ModelFixerServices
      */
     protected function isGetAttributeMethod(string $method)
     {
-        return (
+        return
             Str::startsWith($method, 'get')
             && Str::endsWith($method, 'Attribute')
-            && $method !== 'getAttribute'
-        );
+            && $method !== 'getAttribute';
     }
 
     /**
@@ -330,10 +341,9 @@ class ModelFixerServices
      */
     protected function isScopeMethod(string $method)
     {
-        return (
+        return
             Str::startsWith($method, 'scope')
-            && $method !== 'scopeQuery'
-        );
+            && $method !== 'scopeQuery';
     }
 
     /**
@@ -343,20 +353,18 @@ class ModelFixerServices
      */
     protected function isSetAttributeMethod(string $method)
     {
-        return (
+        return
             Str::startsWith($method, 'set')
             && Str::endsWith($method, 'Attribute')
-            && $method !== 'setAttribute'
-        );
+            && $method !== 'setAttribute';
     }
-
 
     /**
      * 从 get<name>Attribute 方法中设置属性
      * @param $method
-     * @return bool
      * @throws BindingResolutionException
-     * @throws ReflectionException
+     * @throws \ReflectionException
+     * @return bool
      */
     protected function setPropertiesFromGetAttributeMethods(string $method)
     {
@@ -375,26 +383,9 @@ class ModelFixerServices
         $type = $this->getReturnType($reflection);
         $type = $this->getTypeInModel($model, $type);
         $title = $this->getMethodTitle($reflection);
-        $this->setProperty($name, $type, true, null,$title);
+        $this->setProperty($name, $type, true, null, $title);
 
         return true;
-    }
-
-    /**
-     * @param $reflection
-     * @return string
-     */
-    private function getMethodTitle($reflection){
-        $comment = $reflection->getDocComment();
-        if (! $comment) {
-            return '';
-        }
-            $factory = DocBlockFactory::createInstance();
-            $docblock = $factory->create(
-                $comment,
-                (new ContextFactory())->createFromReflector($reflection)
-            );
-        return $docblock->getSummary();
     }
 
     /**
@@ -404,8 +395,7 @@ class ModelFixerServices
      */
     protected function setPropertiesFromSetAttributeMethods($method)
     {
-
-        //Magic set<name>Attribute
+        // Magic set<name>Attribute
         if (!$this->isSetAttributeMethod($method)) {
             return false;
         }
@@ -416,15 +406,16 @@ class ModelFixerServices
         }
 
         $this->setProperty($name, null, null, true);
+
         return true;
     }
 
     /**
      * 判断是否是orm关系方法
      * @param string $method
-     * @return bool
      * @throws BindingResolutionException
-     * @throws ReflectionException
+     * @throws \ReflectionException
+     * @return bool
      */
     protected function isRelationMethod(string $method)
     {
@@ -435,7 +426,7 @@ class ModelFixerServices
 
         $model = $this->modelInstance();
 
-        //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
+        // Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
         $reflection = new \ReflectionMethod($model, $method);
 
         if ($returnType = $reflection->getReturnType()) {
@@ -452,7 +443,7 @@ class ModelFixerServices
                 continue;
             }
 
-            //Resolve the relation's model to a Relation object.
+            // Resolve the relation's model to a Relation object.
             $methodReflection = new \ReflectionMethod($model, $method);
             if ($methodReflection->getNumberOfParameters()) {
                 continue;
@@ -464,15 +455,15 @@ class ModelFixerServices
                 return true;
             }
         }
+
         return false;
     }
-
 
     /**
      * 从orm关系方法中获取property并设置
      * @param string $method
      * @throws BindingResolutionException
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     protected function setPropertiesFromRelationMethod(string $method)
     {
@@ -482,8 +473,8 @@ class ModelFixerServices
         $relatedModelClass = get_class($relationObj->getRelated());
         if (strpos(get_class($relationObj), 'Many') !== false) {
             $collection = $this->getCollectionClass($relatedModelClass);
-            $this->setProperty($method, $collection . '|' . '\\' . $relatedModelClass . '[]', true, null);
-            //$this->setProperty(Str::snake($method) . '_count', 'int|null', true, false);
+            $this->setProperty($method, $collection . '|\\' . $relatedModelClass . '[]', true, null);
+            // $this->setProperty(Str::snake($method) . '_count', 'int|null', true, false);
 
             return;
         }
@@ -501,8 +492,7 @@ class ModelFixerServices
             return;
         }
 
-
-        //Single model is returned
+        // Single model is returned
         $this->setProperty(
             $method,
             '\\' . $relatedModelClass,
@@ -511,22 +501,19 @@ class ModelFixerServices
             '',
             $this->isRelationNullable($relationObj)
         );
-
-        return;
     }
-
 
     /**
      * 获取指定的方法的实现代码
      * @param string $method
-     * @return false|string
      * @throws BindingResolutionException
-     * @throws ReflectionException
+     * @throws \ReflectionException
+     * @return false|string
      */
     protected function getMethodContent(string $method)
     {
         $model = $this->modelInstance();
-        //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
+        // Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
         $reflection = new \ReflectionMethod($model, $method);
 
         $file = new \SplFileObject($reflection->getFileName());
@@ -543,7 +530,6 @@ class ModelFixerServices
         return substr($code, $begin, strrpos($code, '}') - $begin + 1);
     }
 
-
     /**
      * 从某个orm方法中获取关联关系
      * @param string $method
@@ -553,13 +539,12 @@ class ModelFixerServices
     {
         return Relation::noConstraints(function () use ($method) {
             try {
-                return $this->modelInstance()->$method();
+                return $this->modelInstance()->{$method}();
             } catch (\Throwable $e) {
                 return null;
             }
         });
     }
-
 
     /**
      * 获取关联关系对象映射
@@ -572,8 +557,8 @@ class ModelFixerServices
 
     /**
      * 获取model文件的内容
-     * @return string
      * @throws FileNotFoundException
+     * @return string
      */
     protected function getModelFileContent()
     {
@@ -583,36 +568,34 @@ class ModelFixerServices
     /**
      * 设置model文件的内容
      * @param string $newComment
-     * @return bool
      * @throws FileNotFoundException
+     * @return bool
      */
     protected function setModelFileContent(string $newComment)
     {
         $originalDoc = $this->reflection->getDocComment();
         $content = $this->getModelFileContent();
 
-        //如果原来有注释，则覆盖
+        // 如果原来有注释，则覆盖
         if ($originalDoc) {
             $newContent = str_replace($originalDoc, $newComment, $content);
-            //$this->file->put($this->reflection->getFileName(), $newContent);
+            // $this->file->put($this->reflection->getFileName(), $newContent);
             $this->file->replace($this->reflection->getFileName(), $newContent);
-            //logger(file_get_contents($this->reflection->getFileName()));
+            // logger(file_get_contents($this->reflection->getFileName()));
             return true;
         }
         $pos = strpos($content, "class {$this->reflection->getShortName()}");
-        //如果原来没有注释，则获取类的起始位置
+        // 如果原来没有注释，则获取类的起始位置
         if ($pos !== false) {
             $content = substr_replace($content, $newComment . "\n", $pos, 0);
-            //$this->file->put($this->reflection->getFileName(), $content);
+            // $this->file->put($this->reflection->getFileName(), $content);
             $this->file->replace($this->reflection->getFileName(), $content);
+
             return true;
         }
 
         return false;
     }
-
-
-    protected $properties = [];
 
     /**
      * 设置model的属性
@@ -641,22 +624,7 @@ class ModelFixerServices
         $this->properties[$name]['read'] = $isRead;
         $this->properties[$name]['write'] = $isWrite;
 
-        //logger()->info($name.'->'.$type);
-    }
-
-
-    /**
-     * 获取一个model对象
-     * @return Model|mixed
-     * @throws BindingResolutionException
-     */
-    public function modelInstance()
-    {
-        if (!$this->modelInstance) {
-            $this->modelInstance = app()->make($this->modelClass);
-        }
-
-        return $this->modelInstance;
+        // logger()->info($name.'->'.$type);
     }
 
     /**
@@ -674,13 +642,12 @@ class ModelFixerServices
         return $this->getReturnTypeFromReflection($reflection);
     }
 
-
     /**
      * Get method return type based on it DocBlock comment
      *
      * @param \ReflectionMethod $reflection
      *
-     * @return null|string
+     * @return string|null
      */
     protected function getReturnTypeFromDocBlock(\ReflectionMethod $reflection)
     {
@@ -721,7 +688,6 @@ class ModelFixerServices
         return $type;
     }
 
-
     /**
      * @param object $model
      * @param string|null $type
@@ -742,28 +708,28 @@ class ModelFixerServices
 
     protected function getClassNameInDestinationFile(object $model, string $className): string
     {
-        $reflection = $model instanceof ReflectionClass
+        $reflection = $model instanceof \ReflectionClass
             ? $model
-            : new ReflectionObject($model);
+            : new \ReflectionObject($model);
 
         $className = trim($className, '\\');
 
         $usedClassNames = $this->getUsedClassNames($reflection);
+
         return $usedClassNames[$className] ?? ('\\' . $className);
     }
 
     /**
-     * @param ReflectionClass $reflection
+     * @param \ReflectionClass $reflection
      * @return string[]
      */
-    protected function getUsedClassNames(ReflectionClass $reflection): array
+    protected function getUsedClassNames(\ReflectionClass $reflection): array
     {
         $namespaceAliases = array_flip((new ContextFactory())->createFromReflector($reflection)->getNamespaceAliases());
         $namespaceAliases[$reflection->getName()] = $reflection->getShortName();
 
         return $namespaceAliases;
     }
-
 
     /**
      * Determine a model classes' collection type.
@@ -782,6 +748,7 @@ class ModelFixerServices
 
         /** @var Model $model */
         $model = new $className();
+
         return '\\' . get_class($model->newCollection());
     }
 
@@ -790,12 +757,12 @@ class ModelFixerServices
      *
      * @param Relation $relationObj
      *
+     * @throws \ReflectionException
      * @return bool
-     * @throws ReflectionException
      */
     protected function isRelationNullable(Relation $relationObj): bool
     {
-        $reflectionObj = new ReflectionObject($relationObj);
+        $reflectionObj = new \ReflectionObject($relationObj);
         $relation = $reflectionObj->getShortName();
 
         if (in_array($relation, ['hasOne', 'hasOneThrough', 'morphOne'], true)) {
@@ -817,49 +784,70 @@ class ModelFixerServices
 
     /**
      * @param $model
+     * @param mixed $type
      */
     protected function castPropertiesType($type)
     {
         $realType = 'string';
+
         switch ($type) {
             case 'boolean':
             case 'bool':
                 $realType = 'boolean';
+
                 break;
+
             case 'string':
                 $realType = 'string';
+
                 break;
+
             case 'array':
             case 'json':
                 $realType = 'array';
+
                 break;
+
             case 'object':
                 $realType = 'object';
+
                 break;
+
             case 'int':
             case 'integer':
                 $realType = 'int';
+
                 break;
+
             case 'timestamp':
                 $realType = 'integer';
+
                 break;
+
             case 'real':
             case 'double':
             case 'float':
                 $realType = 'float';
+
                 break;
+
             case 'date':
             case 'datetime':
                 $realType = $this->dateClass;
+
                 break;
+
             case 'collection':
                 $realType = '\Illuminate\Support\Collection';
+
                 break;
+
             default:
                 // In case of an optional custom cast parameter , only evaluate
                 // the `$type` until the `:`
                 $type = strtok($type, ':');
                 $realType = class_exists($type) ? ('\\' . $type) : 'mixed';
+
                 break;
         }
 
@@ -891,5 +879,24 @@ class ModelFixerServices
         }
 
         return $reflectionType;
+    }
+
+    /**
+     * @param $reflection
+     * @return string
+     */
+    private function getMethodTitle($reflection)
+    {
+        $comment = $reflection->getDocComment();
+        if (!$comment) {
+            return '';
+        }
+        $factory = DocBlockFactory::createInstance();
+        $docblock = $factory->create(
+            $comment,
+            (new ContextFactory())->createFromReflector($reflection)
+        );
+
+        return $docblock->getSummary();
     }
 }
